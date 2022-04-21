@@ -1,0 +1,12 @@
+#FindTrackLengthInWater Config File
+# all variables retrieved with m_variables.Get() must be defined here!
+
+verbosity 4
+MaxTotalHitsToDNN 1100
+#WriteTrackLengthToFile 1
+#InputFile /ToolAnalysisLink/Data_Energy_Reco/TreeMaker/PhaseIITree.root
+#OutputDirectory /ToolAnalysisLink/Data_Energy_Reco/Output/newfile.root
+#Outputfile trainParam.csv
+
+
+

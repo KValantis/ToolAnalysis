@@ -1,0 +1,3 @@
+# config file
+#add all the variables and their values, that are being loaded by m_variables.Get inside each tool
+verbose 2

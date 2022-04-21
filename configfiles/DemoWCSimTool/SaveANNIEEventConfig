@@ -1,0 +1,3 @@
+# Dummy config file
+verbose 2
+path Home/Desktop/Data_Energy_Reco/Output #./recoStore_output #./store_output
