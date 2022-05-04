@@ -123,5 +123,11 @@ if (tool=="MonitorTrigger") ret=new MonitorTrigger;
 if (tool=="EventClassification") ret=new EventClassification;
 
 if (tool=="DataSummary") ret=new DataSummary;
+if (tool=="MyFirstTool") ret=new MyFirstTool;
+if (tool=="MyFirstTool") ret=new MyFirstTool;
+if (tool=="MySecondTool") ret=new MySecondTool;
+if (tool=="CalcDNNTrackLengthANDEnergyVars") ret=new CalcDNNTrackLengthANDEnergyVars;
+if (tool=="CalcDNNTrackLengthANDEnergyVars") ret=new CalcDNNTrackLengthANDEnergyVars;
+if (tool=="WriteTrainingCsvFiles") ret=new WriteTrainingCsvFiles;
 return ret;
 }

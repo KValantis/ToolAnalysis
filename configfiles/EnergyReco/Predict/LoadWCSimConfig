@@ -7,7 +7,8 @@ verbose 1
 #InputFile /pnfs/annie/persistent/users/moflaher/wcsim/multipmt/tankonly/wcsim_3-12-18_ANNIEp2v6_BNB_Water_10k_22-05-17/wcsim_0.0.0.root
 #InputFile /pnfs/annie/persistent/users/moflaher/wcsim/multipmt/tankonly/wcsim_29_03_19_ANNIEp2v6_muonsonly_nodigit_BNB_Water_10k_22-05-17/wcsim_0.*.root
 #InputFile /ToolAnalysisLink/Data_Energy_Reco/wcsim_beam_gst_1_99_0.199.root
-InputFile /ToolAnalysisLink/Data_Energy_Reco/wcsim_0.1221.9.root
+InputFile /ToolAnalysisLink/Data_Energy_Reco/wcsim_0.1221.*.root
+TriggerType Beam
 
 WCSimVersion 3               ## should reflect the WCSim version of the files being loaded
 HistoricTriggeroffset 0      ## time offset of digits relative to the trigger

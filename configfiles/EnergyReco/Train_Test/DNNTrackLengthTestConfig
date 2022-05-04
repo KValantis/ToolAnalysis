@@ -8,11 +8,11 @@ TrackLengthWeightsFile /ToolAnalysisLink/UserTools/DNNTrackLength/stand_alone/we
 TrackLengthTestingDataFile /ToolAnalysisLink/Data_Energy_Reco/Output/DNN_testing_input.csv
 
 # output file for predictions. This will be used to train the BDT.
-TrackLengthPredictionsDataFile ../LocalFolder/BDT_training_input.csv
+TrackLengthPredictionsDataFile /ToolAnalysisLink/Data_Energy_Reco/Output/BDT_training_input.csv
 
 # Output predictions may be split into two files, suitable for training then testing the BDTs.
 # To do so, provide the number of events to put into the training file, then subsequent
 # events will go into the testing file.
 # To write all predictions to a single file, pass 0 or give no BDT testing filename
 FirstFileEntries 10000
-TrackLengthPredictionsDataFile2 ../LocalFolder/BDT_testing_input.csv
+TrackLengthPredictionsDataFile2 /ToolAnalysisLink/Data_Energy_Reco/Output/BDT_testing_input.csv

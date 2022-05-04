@@ -1,0 +1,54 @@
+1 --What we are doing, is opening root files which include reconstucted vertex and direction. We then save the data in csv files, which we will use in python files to reconstuct the energy. After having the energy read, we will import it in a new tool/toolchain combination, in order to add the energy in the previously used root files
+
+Marcus provided me with a branch from github that has 2 folders inside the EnergyRecoToolchain (Predict/ Train_test). Link is here https://github.com/marc1uk/ToolAnalysis/tree/keras2/configfiles/EnergyReco
+Then you have to create two symlink's, one for each folders in order to run them
+These two are:
+
+
+ln -s configfiles/EnergyReco/Train_Test/ToolChainConfig EnergyRecoTrain_Test
+
+
+ln -s configfiles/EnergyReco/Predict/ToolChainConfig EnergyRecoPredict
+Firstly, we will try to run the energy train_test toolchain and then the predict
+
+Got all code from the toolanalysis  main branch, except from the FindTrackLength tool, which was altered from the keras2 branch. Also i used the WriteTrainingCsvFiles from keras2 which was not used previously
+
+Inside the DigitBuilder config file, you have to set for PMT_only to use only pmt files
+Also inside the FindTrackLenthInWater, you have to comment out some stuff. Lines 169-174 that search for MCLAPPDHits should get commented out, however it should have worked with PMT_only option. Its not beautiful, but it works i guess. Next up, i had to comment out lines 205-221 to make it work proper.
+
+Apart from these, some minor changes may be needed in all config files to make it work
+
+Marcus also gave me his path that the newest wcsim files were, this is the following: /pnfs/annie/persistent/users/moflaher/wcsim/multipmt/tankonly/wcsim_25_04_19_ANNIEp2v6_nodigit_BNB_Water_10k_22-05-17/
+
+Download with a line like: ''scp -o GSSAPIAuthentication=true [username]@anniegpvm01.fnal.gov:/pnfs/annie/persistent/users/moflaher/wcsim/multipmt/tankonly/wcsim_25_04_19_ANNIEp2v6_nodigit_BNB_Water_10k_22-05-17/wcsim_0.1221.9.root .    (the . at the end signifies that it will download the file in the current directory of the terminal
+
+from there I used rootfiles with the ending 0_1221.(7-8-9).root
+
+From the toolchainconfig file i changed the inline number to increase the events that i use in the toolchain. In the future when i will use the cluster i will use more files from that directory
+
+Downloaded the Application branch on the ToolAnalysisLink folder from marck1uk toolanalysis. get these with this command:
+''git remote add marc1uk https://github.com/marc1uk/ToolAnalysis.git
+  git pull marc1uk Application ''
+  
+after you do the pull, you need to modify the Makefile such that it has "-lboost_regex" after "-lboost_system" in line 12 otherwise it will have problems compiling
+
+after that, i got an error on MrdEfficiency tool, (strange), deleted the MrdEfficiency.o file inside the UserTools folder and make clean, make -j4 and it was fine
+
+when you run a python script, if the initialise function is throwing an error (probably something about a positional argument), generally not initialising (you check this out by running interactively and see the error), inside the script, next to the initialise function you have to use pyinit as the argument. 
+
+So instead of "Initialise()" you have to write "Initialise(pyinit)". You dont have to do the same for the other functions, just this one
+
+when running the final tools of the toolchain, at the step of loading the  model weights,, i had an issue with the weights life, throwing an error ''AttributeError: 'str' object has no attribute 'decode' '' .
+
+To solve this, i used ''pip3 install 'h5py==2.10.0' --force-reinstall''
+
+
+
+
+
+
+
+
+
+
+
