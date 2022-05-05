@@ -1,0 +1,4 @@
+test1 DummyTool configfiles/Dummy/DummyToolConfig
+test2 DummyTool configfiles/Dummy/DummyToolConfig
+MyFirstTool1 MyFirstTool Null
+

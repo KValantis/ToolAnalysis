@@ -1,0 +1,17 @@
+verbose 5
+
+OutputFile AmBeFile_DefaultOutput.ntuple.root
+TankClusterProcessing 1
+MRDClusterProcessing 0
+TriggerProcessing 1
+
+TankHitInfo_fill 1
+SiPMPulseInfo_fill 1
+MRDHitInfo_fill 0
+MRDReco_fill 0
+fillCleanEventsOnly 0
+MCTruth_fill 0
+Reco_fill 0
+RecoDebug_fill 0
+muonTruthRecoDiff_fill 0
+

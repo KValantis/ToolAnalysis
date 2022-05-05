@@ -1,0 +1,37 @@
+sudo: false
+
+language: cpp
+
+compiler: gcc
+dist: trusty
+
+services:
+  - docker
+
+before_install:
+  - docker pull anniesoft/toolanalysis:base
+
+install:
+  - docker run --rm -v `pwd`:/root/buildtest anniesoft/toolanalysis:base /bin/sh -c " cd /root/buildtest ; ln -s /ToolAnalysis/ToolDAQ ./ToolDAQ ; source ./Setup.sh ; make clean; make update; make "
+
+jobs:
+  include:
+    - stage: test
+      script: docker run --rm -v `pwd`:/root/buildtest anniesoft/toolanalysis:base /bin/sh -c " cd /root/buildtest ; source ./Setup.sh ; ./Analyse "
+    - 
+      script: 
+        - docker run --rm -v `pwd`:/root/buildtest anniesoft/toolanalysis:base /bin/sh -c " cd /root/buildtest ; source ./Setup.sh ; ./Analyse Example1"
+        - docker run --rm -v `pwd`:/root/buildtest anniesoft/toolanalysis:base /bin/sh -c " cd /root/buildtest ; source ./Setup.sh ; ./Analyse Example3"
+        - docker run --rm -v `pwd`:/root/buildtest anniesoft/toolanalysis:base /bin/sh -c " cd /root/buildtest ; source ./Setup.sh ; ./Analyse Example5"
+    -
+      script: 
+        - docker run --rm -v `pwd`:/root/buildtest anniesoft/toolanalysis:base /bin/sh -c " cd /root/buildtest ; source ./Setup.sh ; ./Analyse Example2"
+        - docker run --rm -v `pwd`:/root/buildtest anniesoft/toolanalysis:base /bin/sh -c " cd /root/buildtest ; source ./Setup.sh ; ./Analyse Example4"
+
+notifications:
+  email:
+    recipients:
+      - b.richards@qmul.ac.uk
+    on_success: never # default: change
+    on_failure: always # default: always
+

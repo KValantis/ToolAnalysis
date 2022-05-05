@@ -1,0 +1,11 @@
+# This config file stores variables that may be retrieved by the python script
+# Access them by retrieving the corresponding variable from the 'Config' store
+
+# model weights file
+TrackLengthWeightsFile /ToolAnalysisLink/UserTools/DNNTrackLength/stand_alone/weights/weights_bets.hdf5
+
+# output file for predictions, if we want to make a legacy-style csv output
+TrackLengthPredictionsDataFile /ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv  # use 'NA' to skip
+
+TrackLengthTestingDataFile /ToolAnalysisLink/Data_Energy_Reco/Output/DNN_training_input.csv
+TrackLengthWeightsFile /ToolAnalysisLink/UserTools/DNNTrackLength/stand_alone/weights/weights_bets.hdf5
