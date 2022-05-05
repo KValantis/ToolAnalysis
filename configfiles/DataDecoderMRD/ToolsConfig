@@ -1,4 +1,0 @@
-LoadGeometry LoadGeometry ./configfiles/DataDecoderMRD/LoadGeometryConfig
-LoadRawData LoadRawData ./configfiles/DataDecoderMRD/LoadRawDataConfig
-MRDDataDecoder MRDDataDecoder ./configfiles/DataDecoderMRD/MRDDataDecoderConfig
-ANNIEEventBuilder ANNIEEventBuilder ./configfiles/DataDecoderMRD/ANNIEEventBuilderConfig

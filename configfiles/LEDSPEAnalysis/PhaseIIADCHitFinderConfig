@@ -1,4 +1,0 @@
-verbosity 0
-
-UseLEDWaveforms 1
-PulseFindingApproach full_window_maxpeak

@@ -1,5 +1,0 @@
-verbosity 5
-BuildType MRD
-Mode FileList
-InputFile ./configfiles/DataDecoderMRD/my_files.txt
-DummyRunInfo 1

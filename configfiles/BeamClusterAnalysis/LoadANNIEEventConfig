@@ -1,3 +1,0 @@
-verbose 2
-FileForListOfInputs ./configfiles/BeamClusterAnalysis/my_inputs.txt
-EventOffset 0

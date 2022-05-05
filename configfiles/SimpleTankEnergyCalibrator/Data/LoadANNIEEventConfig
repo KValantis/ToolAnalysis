@@ -1,3 +1,0 @@
-verbose 4
-FileForListOfInputs ./configfiles/SimpleTankEnergyCalibrator/Data/my_inputs.txt
-EventOffset 15000

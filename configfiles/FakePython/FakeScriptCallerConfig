@@ -1,5 +1,0 @@
-PythonScript my_fake_tool
-InitialiseFunction Initialise
-ExecuteFunction Execute
-FinaliseFunction Finalise
-ConfigurationsFile configfiles/FakePython/FakeScriptConfig

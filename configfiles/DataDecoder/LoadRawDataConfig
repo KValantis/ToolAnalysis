@@ -1,5 +1,0 @@
-verbosity 5
-BuildType TankAndMRDAndCTC
-Mode FileList
-InputFile ./configfiles/DataDecoder/my_files.txt
-DummyRunInfo 1

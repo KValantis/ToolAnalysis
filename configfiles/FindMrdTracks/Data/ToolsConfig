@@ -1,5 +1,0 @@
-myLoadGeometry LoadGeometry configfiles/FindMrdTracks/Data/LoadGeometryConfig
-myLoadANNIEEvent LoadANNIEEvent configfiles/FindMrdTracks/Data/LoadANNIEEventConfig
-myTimeClustering TimeClustering configfiles/FindMrdTracks/Data/TimeClusteringConfig
-myFindMrdTracks FindMrdTracks configfiles/FindMrdTracks/Data/FindMrdTracksConfig
-myPlotMrdTracks MrdPaddlePlot configfiles/FindMrdTracks/Data/MrdPaddlePlotConfig

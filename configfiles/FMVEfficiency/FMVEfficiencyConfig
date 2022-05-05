@@ -1,6 +1,0 @@
-# FMVEfficiency config file
-SinglePEGains ./configfiles/FMVEfficiency/ChannelSPEGains_BeamRun20192020.csv
-verbosity 0
-OutputFile FMVEfficiency_R1623_PMTMRD_p3
-UseTank 1
-IsData 1
