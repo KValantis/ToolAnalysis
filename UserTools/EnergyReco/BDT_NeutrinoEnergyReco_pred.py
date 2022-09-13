@@ -29,12 +29,13 @@ import pickle
 
 #-------- File with events for reconstruction:
 #--- evts for training:
-infile = "../LocalFolder/vars_Ereco.csv"
+infile = "/ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv"
 #--- evts for prediction:
-infile2 = "../LocalFolder/vars_Ereco.csv"
+infile2 = "/ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv"
 #----------------
 
-def Initialise():
+def Initialise(pyinit):
+    print("Initialising BDT_NeutrinoEnergyReco_pred.py")
     return 1
 
 def Finalise():
@@ -108,7 +109,7 @@ def Execute():
     n_estimators=1000
 
     # read model from the disk
-    filename = 'finalized_BDTmodel_forNeutrinoEnergy.sav'
+    filename = '/ToolAnalysisLink/UserTools/EnergyReco/stand_alone/weights/finalized_BDTmodel_forNeutrinoEnergy.sav'
     #pickle.dump(model, open(filename, 'wb'))
  
     # load the model from disk

@@ -29,12 +29,13 @@ import pickle
 
 #-------- File with events for reconstruction:
 #--- evts for training:
-infile = "../LocalFolder/vars_Ereco.csv"
+infile = "/ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv"
 #--- evts for prediction:
-infile2 = "../LocalFolder/vars_Ereco.csv"
+infile2 = "/ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv"
 #----------------
 
-def Initialise():
+def Initialise(pyinit):
+    print("Initialising BDT_MuonEnergyReco_pred.py")
     return 1
 
 def Finalise():
@@ -43,6 +44,7 @@ def Finalise():
 
 def Execute():
     # Set TF random seed to improve reproducibility
+    print("BDT_MuonEnergyReco_pred.py Executing")
     seed = 170
     np.random.seed(seed)
 
@@ -53,11 +55,29 @@ def Execute():
     bins = int((E_high-E_low)/div)
     print('bins: ', bins)
 
+    #print( "--- loading input variables from store!")
     print( "--- opening file with input variables!") 
     #--- events for training ---
     filein = open(str(infile))
     print("evts for training in: ",filein)
     df00=pd.read_csv(filein)
+    #totalPMTs=Store.GetStoreVariable('EnergyReco','num_pmt_hits')
+    #totalLAPPDs=Store.GetStoreVariable('EnergyReco','num_lappd_hits')
+    #TrueTrackLengthInWater=Store.GetStoreVariable('EnergyReco','TrueTrackLengthInWater')
+    #neutrinoE=Store.GetStoreVariable('EnergyReco','trueNueE')
+    #trueKE=Store.GetStoreVariable('EnergyReco','trueE')
+    #diffDirAbs=Store.GetStoreVariable('EnergyReco','diffDirAbs2')
+    #TrueTrackLengthInMrd=Store.GetStoreVariable('EnergyReco','TrueTrackLengthInMrd2')
+    #recoDWallR=Store.GetStoreVariable('EnergyReco','recoDWallR2')
+    #recoDWallZ=Store.GetStoreVariable('EnergyReco','recoDWallZ2')
+    #dirVec=Store.GetStoreVariable('EnergReco','dirVec')
+    #dirX=dirVec->GetDirection().X()
+    #dirY=dirVec->GetDirection().Y()
+    #dirZ=dirVec->GetDirection().Z()
+    #vtxX=dirVec->GetPosition().X()
+    #vtxY=dirVec->GetPosition().Y()
+    #vtxZ=dirVec->GetPosition().Z()
+    #DNNRecoLength=Store.GetStoreVariable('EnergyReco',)
     df0=df00[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater','neutrinoE','trueKE','diffDirAbs','TrueTrackLengthInMrd','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
     dfsel=df0.loc[df0['neutrinoE'] < E_threshold]
 
@@ -108,7 +128,7 @@ def Execute():
     n_estimators=1000
 
     # read model from the disk
-    filename = 'finalized_BDTmodel_forMuonEnergy.sav'
+    filename = '/ToolAnalysisLink/UserTools/EnergyReco/stand_alone/weights/finalized_BDTmodel_forMuonEnergy.sav'
     #pickle.dump(model, open(filename, 'wb'))
  
     # load the model from disk
@@ -135,7 +155,7 @@ def Execute():
     assert(df_final.shape[0]==df2.shape[0])
 
     #save results to .csv:  
-    df_final.to_csv("ErecoEmu_results.csv", float_format = '%.3f')
+    df_final.to_csv("/ToolAnalysisLink/Data_Energy_Reco/ErecoEmu_results.csv", float_format = '%.3f')
 
 #    nbins=np.arange(-100,100,2)
 #    fig,ax0=plt.subplots(ncols=1, sharey=True)#, figsize=(8, 6))

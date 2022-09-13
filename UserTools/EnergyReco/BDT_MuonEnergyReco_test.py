@@ -118,8 +118,8 @@ def Execute(Toolchain=True, testingdatafilename=None, E_threshold=None, modelfil
 
 if __name__ == "__main__":
     # Make the script runnable as a standalone python script too?
-    testingdatafilename = '../LocalFolder/BDT_testing_input.csv'
-    predictionsdatafilename = '../LocalFolder/E_Mu_reco_results.csv'
-    modelfilename = '../LocalFolder/finalized_BDTmodel_forMuonEnergy.sav'
+    testingdatafilename = '/ToolAnalysisLink/Data_Energy_Reco/BDT_testing_input.csv'
+    predictionsdatafilename = '/ToolAnalysisLink/Data_Energy_Reco/E_Mu_reco_results.csv'
+    modelfilename = '/ToolAnalysisLink/UserTools/EnergyReco/stand_alone/weights/finalized_BDTmodel_forMuonEnergy.sav'
     E_threshold=2.
     Execute(False, testingdatafilename, E_threshold, modelfilename, predictionsdatafilename)

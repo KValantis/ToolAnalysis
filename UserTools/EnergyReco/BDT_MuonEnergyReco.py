@@ -28,12 +28,12 @@ from sklearn.metrics import mean_squared_error
 
 #-------- File with events for reconstruction:
 #--- evts for training:
-infile = "../LocalFolder/vars_Ereco.csv"
+infile = "/ToolAnalysisLink/Data_Energy_Reco/vars_Ereco.csv"
 #--- evts for prediction:
-infile2 = "../LocalFolder/vars_Ereco.csv"
+infile2 = "/ToolAnalysisLink/Data_Energy_Reco/vars_Ereco.csv"
 #----------------
 
-def Initialise():
+def Initialise(pyinit):
     return 1
 
 def Finalise():
@@ -166,7 +166,7 @@ def Execute():
     assert(df_final.shape[0]==df2.shape[0])
 
     #save results to .csv:  
-    df_final.to_csv("Ereco_results.csv", float_format = '%.3f')
+    df_final.to_csv("/ToolAnalysisLink/Data_Energy_Reco/Ereco_results.csv", float_format = '%.3f')
 
 #    nbins=np.arange(-100,100,2)
 #    fig,ax0=plt.subplots(ncols=1, sharey=True)#, figsize=(8, 6))

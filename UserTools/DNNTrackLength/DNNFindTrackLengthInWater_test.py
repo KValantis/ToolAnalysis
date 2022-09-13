@@ -65,7 +65,7 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     
     # Load Data
     #-----------------------------
-    print( "--- loading input variables from store!")
+    #print( "--- loading input variables from store!")
     '''
     hit_lambdas = Store.GetStoreVariable('EnergyReco','lambda_vec')  # std::vectors in the Store are returned
     hit_times = Store.GetStoreVariable('EnergyReco','digit_ts_vec')  # as python lists
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     # Make the script runnable as a standalone python script too?
     testingdatafilename = '/ToolAnalysisLink/Data_Energy_Reco/Output/DNN_testing_input.csv'
     weightsfilename = '/ToolAnalysisLink/UserTools/DNNTrackLength/stand_alone/weights/weights_bets.hdf5'
-    predictionsdatafilename = '../LocalFolder/BDT_training_input.csv'
+    predictionsdatafilename = '/ToolAnalysisLink/Data_Energy_Reco/BDT_training_input.csv'
     firstfilesentries = 1000
-    predictionsdatafilename2 = '../LocalFolder/BDT_testing_input.csv'
+    predictionsdatafilename2 = '/ToolAnalysisLink/Data_Energy_Reco/BDT_testing_input.csv'
     Execute(False, testingdatafilename, weightsfilename, predictionsdatafilename, firstfilesentries, predictionsdatafilename2)

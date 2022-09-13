@@ -68,7 +68,7 @@ def create_model():
     return model
 
 def Execute(Toolchain=True, trainingdatafilename=None, weightsfilename=None):
-    print("DNNFineTrackLengthInWater_train.py Executing")
+    print("DNNFindTrackLengthInWater_train.py Executing")
 
     #--- events for training - MC events
     # get training data file path from store
@@ -149,6 +149,6 @@ if __name__ == "__main__":
     # Make the script runnable as a standalone python script too?
     print("DNNFindTrackLengthInWater_train.py called as main")
     trainingdatafilename = '/ToolAnalysisLink/Data_Energy_Reco/Output/DNN_training_input.csv'
-    weightsfilename = '../LocalFolder/weights_bets.hdf5'
+    weightsfilename = '/ToolAnalysisLink/Data_Energy_Reco/weights_bets.hdf5'
     print("calling Execute with training data "+trainingdatafilename+" to save weights to "+weightsfilename)
     Execute(False, trainingdatafilename, weightsfilename)

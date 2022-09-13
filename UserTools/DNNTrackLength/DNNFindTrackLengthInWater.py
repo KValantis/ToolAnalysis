@@ -24,11 +24,11 @@ from sklearn import preprocessing
 
 #--------- File with events for reconstruction:
 #--- evts for training:
-infile = "../LocalFolder/NEWdata_forRecoLength_9_10MRD.csv"
-#infile = "../LocalFolder/data_forRecoLength_9.csv"
+#infile = "../LocalFolder/NEWdata_forRecoLength_9_10MRD.csv"
+infile = "/ToolAnalysisLink/Data_Energy_Reco/data_forRecoLength_9.csv"
 #--- evts for prediction:
-infile2 = "../LocalFolder/NEWdata_forRecoLength_0_8MRD.csv" 
-#infile2 = "../LocalFolder/data_forRecoLength_9.csv"
+#infile2 = "../LocalFolder/NEWdata_forRecoLength_0_8MRD.csv" 
+infile2 = "/ToolAnalysisLink/Data_Energy_Reco/data_forRecoLength_9.csv"
 #
 
 def Initialise():
@@ -125,7 +125,7 @@ def Execute():
     assert(df0.shape[0]==len(y_predicted))
     assert(df_final.shape[0]==df.shape[0])
 
-    df_final.to_csv("../LocalFolder/vars_Ereco.csv", float_format = '%.3f')
+    df_final.to_csv("/ToolAnalysisLink/Data_Energy_Reco/vars_Ereco.csv", float_format = '%.3f')
 
     #---if asserts fails check dimensions with these print outs:
     #print("df: ",df.head())

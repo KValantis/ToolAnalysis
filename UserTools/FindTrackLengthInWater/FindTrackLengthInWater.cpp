@@ -281,7 +281,7 @@ bool FindTrackLengthInWater::Execute(){
         Log("FindTrackLengthInWater Tool: putting event "+to_string(EventNumber)+" into the EnergyReco store",v_debug,verbosity);
         m_data->Stores.at("EnergyReco")->Set("ThisEvtNum",EventNumber);
         //std::cout<<"This is the Eventnumber you are looking for"<<EventNumber<<std::endl;
-        //std::cout<<"This is the lambda_vec before being set into the boostStore"<<lambda_vector.size()<<std::endl;
+        std::cout<<"This is the lambda_vec before being set into the boostStore"<<lambda_vector.size()<<std::endl;
         for (int i=0; i < (int) lambda_vector.size(); i++){std::cout << lambda_vector.at(i)<<std::endl;}
         Log("FindTrackLengthInWater Tool: lambda_vector: "+to_string(lambda_vector.size())+"  FINISHED",v_debug,verbosity);
         m_data->Stores.at("EnergyReco")->Set("lambda_vec",lambda_vector);
