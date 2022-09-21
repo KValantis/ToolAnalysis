@@ -2,13 +2,13 @@
 # Access them by retrieving the corresponding variable from the 'Config' store
 
 # BDT model file to load
-BDTNeutrinoModelFile ../LocalFolder/finalized_BDTmodel_forNeutrinoEnergy.sav
+BDTNeutrinoModelFile finalized_BDTmodel_forNeutrinoEnergy.sav
 
 # testing data
-NeutrinoEnergyTestingDataFile ../LocalFolder/BDT_testing_input.csv
+NeutrinoEnergyTestingDataFile ToolAnalysisLink/Data_Energy_Reco/BDT_testing_input.csv/
 
 # predictions file
-NeutrinoEnergyPredictionsFile ../LocalFolder/E_Nu_reco_results.csv     # Use 'NA' to not write predictions to file
+NeutrinoEnergyPredictionsFile ToolAnalysisLink/Data_Energy_Reco/E_Nu_reco_results.csv     # Use 'NA' to not write predictions to file
 
 # deprecated: only train with neutrinos below this threshold
 BDT_NuE_threshold 2.0  # [GeV]

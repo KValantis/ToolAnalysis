@@ -20,7 +20,7 @@ from sklearn import linear_model, ensemble
 from sklearn.metrics import mean_squared_error
 import pickle
 
-def Initialise():
+def Initialise(pyinit):
     return 1
 
 def Finalise():

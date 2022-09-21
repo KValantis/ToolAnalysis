@@ -29,7 +29,7 @@ import pickle
 
 #-------- File with events for reconstruction:
 #--- evts for training:
-infile = "../ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv"
+infile = "../ToolAnalysisLink/Data_Energy_Reco/BDT_training_input.csv"
 #----------------
 
 def Initialise(pyinit):
