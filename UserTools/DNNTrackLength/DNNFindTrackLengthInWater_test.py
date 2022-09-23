@@ -85,6 +85,7 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     # read into a pandas structure
     print("reading file with pandas")
     testfiledata = pandas.read_csv(testfile, sep=',', header=0)
+    print(testfiledata.head())
     print("closing file")
     testfile.close()
     # convert to 2D numpy array

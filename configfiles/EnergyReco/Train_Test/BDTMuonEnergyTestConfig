@@ -5,7 +5,7 @@
 BDTMuonModelFile finalized_BDTmodel_forMuonEnergy.sav
 
 # testing data
-MuonEnergyTestingDataFile /ToolAnalysisLink/Data_Energy_Reco/BDT_testing_input.csv
+MuonEnergyTestingDataFile /ToolAnalysisLink/Data_Energy_Reco/BDT_training_input.csv
 
 # predictions file
 MuonEnergyPredictionsFile /ToolAnalysisLink/Data_Energy_Reco/E_Mu_reco_results.csv     # Use 'NA' to not write predictions to file
