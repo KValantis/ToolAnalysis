@@ -67,7 +67,7 @@ bool WriteTrainingCsvFiles::Initialise(std::string configfile, DataModel &data){
     for (int i=0; i<maxhits0;++i){
        csvfile<<"T_"<<i<<",";
     }
-    csvfile<<"lambdamax,"  //first estimation of track length(using photons projection on track)
+    csvfile<<"lambda_max,"  //first estimation of track length(using photons projection on track)
            //<<"digitT,"
            <<"totalPMTs,"   // number of PMT hits, not number of pmts.
            <<"totalLAPPDs," // number of LAPPD hits... 

@@ -29,9 +29,7 @@ import pickle
 
 #-------- File with events for reconstruction:
 #--- evts for training:
-infile = "/ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv"
 #--- evts for prediction:
-infile2 = "/ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv"
 #----------------
 
 def Initialise(pyinit):
@@ -42,21 +40,24 @@ def Finalise():
  #   ROOT.gSystem.Exit(0)
     return 1
 
-def Execute():
+def Execute(Toolchain=True, testingdatafilename=None, E_threshold=None, modelfilename=None, predictionsdatafilename=None):
     # Set TF random seed to improve reproducibility
     seed = 180
     np.random.seed(seed)
 
-    E_threshold = 2.
+    if Toolchain:
+          E_threshold = Store.GetStoreVariable('Config','BDT_NuE_threshold')
     E_low=0
     E_high=2000
     div=100
     bins = int((E_high-E_low)/div)
     print('bins: ', bins)
 
-    print( "--- opening file with input variables!") 
+    if Toolchain:
+          inputdatafilename = Store.GetStoreVariable('Config','NeutrinoEnergyInputDataFile')
+    print( "--- opening file with input variables"+inputdatafilename) 
     #--- events for training ---
-    filein = open(str(infile))
+    filein = open(str(inputdatafilename))
     print("evts for training in: ",filein)
     df00=pd.read_csv(filein)
     df0=df00[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater','neutrinoE','trueKE','diffDirAbs','TrueTrackLengthInMrd','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
@@ -69,7 +70,7 @@ def Execute():
     assert(dfsel.isnull().any().any()==False)
 
     #--- events for predicting ---
-    filein2 = open(str(infile2))
+    filein2 = open(str(inputdatafilename))
     print(filein2)
     df00b = pd.read_csv(filein2)
     df0b=df00b[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater','neutrinoE','trueKE','diffDirAbs','TrueTrackLengthInMrd','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
@@ -109,11 +110,12 @@ def Execute():
     n_estimators=1000
 
     # read model from the disk
-    filename = '/ToolAnalysisLink/UserTools/EnergyReco/stand_alone/weights/finalized_BDTmodel_forNeutrinoEnergy.sav'
+    if Toolchain:
+          modelfilename = Store.GetStoreVariable('Config','BDTNeutrinoModelFile')
     #pickle.dump(model, open(filename, 'wb'))
  
     # load the model from disk
-    loaded_model = pickle.load(open(filename, 'rb'))
+    loaded_model = pickle.load(open(modelfilename, 'rb'))
     #result = loaded_model.score(X_test, Y_test)
     #print(result) 
 
@@ -136,7 +138,11 @@ def Execute():
     assert(df_final.shape[0]==df2.shape[0])
 
     #save results to .csv:  
-    df_final.to_csv("ErecoENEU_results.csv", float_format = '%.3f')
+    if Toolchain:
+           predictionsdatafilename = Store.GetStoreVariable('Config','NeutrinoEnergyPredictionsFile')
+    if predictionsdatafilename == 'NA':
+        return 1
+    df_final.to_csv(predictionsdatafilename, float_format = '%.3f')
 
 #    nbins=np.arange(-100,100,2)
 #    fig,ax0=plt.subplots(ncols=1, sharey=True)#, figsize=(8, 6))

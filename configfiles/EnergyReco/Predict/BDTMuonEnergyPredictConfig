@@ -2,10 +2,13 @@
 # Access them by retrieving the corresponding variable from the 'Config' store
 
 # BDT model file to load
-BDTMuonModelFile UserTools/EnergyReco/stand_alone/weights/finalized_BDTmodel_forMuonEnergy.sav
+BDTMuonModelFile finalized_BDTmodel_forMuonEnergy.sav
 
 # for generating a legacy-style csv output
-MuonEnergyPredictionsFile Data_Energy_Reco/csv_files/BDT_MuE_predict_output.csv     # Use 'NA' to skip
+MuonEnergyPredictionsFile Data_Energy_Reco/BDT_MuE_predict_output.csv     # Use 'NA' to skip
 
 # deprecated: only train with neutrinos below this threshold
 BDT_NuE_threshold 2.0  # [GeV]
+
+#Input File for Muon Energy predictions
+MuonEnergyInputDataFile /ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv
