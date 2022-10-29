@@ -1,4 +1,4 @@
-PythonScript DNNFindTrackLengthInWater_test
+PythonScript DNNFindTrackLengthInWater_pred
 
 ############### Prediction #################
 # Note: We want this to run after the training, which in this Toolchain occurs during
