@@ -11,4 +11,4 @@ MuonEnergyPredictionsFile Data_Energy_Reco/BDT_MuE_predict_output.csv     # Use 
 BDT_NuE_threshold 2.0  # [GeV]
 
 #Input File for Muon Energy predictions
-MuonEnergyInputDataFile /ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv
+MuonEnergyInputDataFile Data_Energy_Reco/DNN_predict_output.csv

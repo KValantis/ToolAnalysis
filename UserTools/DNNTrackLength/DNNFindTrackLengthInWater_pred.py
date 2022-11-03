@@ -13,15 +13,17 @@ random.seed(12345)
 # Force TensorFlow to use single thread.
 # Multiple threads are a potential source of non-reproducible results.
 # For further details, see: https://stackoverflow.com/questions/42022950/
-session_conf = tensorflow.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+#session_conf = tensorflow.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+tensorflow.config.threading.set_intra_op_parallelism_threads(1)
+tensorflow.config.threading.set_inter_op_parallelism_threads(1)
 from tensorflow.keras import backend as K
 # The below tf.set_random_seed() will make random number generation
 # in the TensorFlow backend have a well-defined initial state.
 # For further details, see:
 # https://www.tensorflow.org/api_docs/python/tf/set_random_seed
-tensorflow.set_random_seed(1234)
-sess = tensorflow.Session(graph=tensorflow.get_default_graph(), config=session_conf)
-K.set_session(sess)
+tensorflow.random.set_seed(1234)
+#sess = tensorflow.Session(graph=tensorflow.get_default_graph(), config=session_conf)
+#K.set_session(sess)
 
 import Store
 import sys

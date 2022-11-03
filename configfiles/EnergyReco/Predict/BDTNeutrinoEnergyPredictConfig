@@ -11,4 +11,4 @@ NeutrinoEnergyPredictionsFile Data_Energy_Reco/BDT_NuE_predict_output.csv     # 
 BDT_NuE_threshold 2.0  # [GeV]
 
 #Input File for Neutrino Energy predictions
-NeutrinoEnergyInputDataFile /ToolAnalysisLink/Data_Energy_Reco/DNN_predict_output.csv
+NeutrinoEnergyInputDataFile Data_Energy_Reco/DNN_predict_output.csv
