@@ -2,7 +2,7 @@
 # Access them by retrieving the corresponding variable from the 'Config' store
 
 # BDT model file to load
-BDTMuonModelFile finalized_BDTmodel_forMuonEnergy.sav
+BDTMuonModelFile UserTools/EnergyReco/stand_alone/weights/finalized_BDTmodel_forMuonEnergy.sav
 
 # for generating a legacy-style csv output
 MuonEnergyPredictionsFile Data_Energy_Reco/BDT_MuE_predict_output.csv     # Use 'NA' to skip
