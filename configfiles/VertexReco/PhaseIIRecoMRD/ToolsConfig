@@ -1,0 +1,14 @@
+LoadWCSim LoadWCSim ./configfiles/VertexReco/PhaseIIRecoMRD/LoadWCSimConfig
+LoadWCSimLAPPD LoadWCSimLAPPD ./configfiles/VertexReco/PhaseIIRecoMRD/LoadWCSimLAPPDConfig
+MCParticleProperties MCParticleProperties ./configfiles/VertexReco/PhaseIIRecoMRD/MCParticlePropertiesConfig
+MCRecoEventLoader MCRecoEventLoader ./configfiles/VertexReco/PhaseIIRecoMRD/MCRecoEventLoaderConfig
+DigitBuilder DigitBuilder ./configfiles/VertexReco/PhaseIIRecoMRD/DigitBuilderConfig
+HitCleaner HitCleaner ./configfiles/VertexReco/PhaseIIRecoMRD/HitCleanerConfig
+ClusterFinder ClusterFinder ./configfiles/VertexReco/PhaseIIRecoMRD/ClusterFinderConfig
+TimeClustering TimeClustering ./configfiles/VertexReco/PhaseIIRecoMRD/TimeClusteringConfig
+EventSelector EventSelector ./configfiles/VertexReco/PhaseIIRecoMRD/EventSelectorConfig
+FindMrdTracks FindMrdTracks ./configfiles/VertexReco/PhaseIIRecoMRD/FindMrdTracksConfig
+VtxSeedGenerator VtxSeedGenerator ./configfiles/VertexReco/PhaseIIRecoMRD/VtxSeedGeneratorConfig
+VtxExtendedVertexFinder VtxExtendedVertexFinder ./configfiles/VertexReco/PhaseIIRecoMRD/VtxExtendedVertexFinderConfig
+#insert calc
+PhaseIITreeMaker PhaseIITreeMaker ./configfiles/VertexReco/PhaseIIRecoMRD/PhaseIITreeMakerConfig

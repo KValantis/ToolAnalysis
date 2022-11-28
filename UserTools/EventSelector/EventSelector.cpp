@@ -137,13 +137,13 @@ bool EventSelector::Execute(){
 
   }
 
-  int fTrigger;
-  auto get_trigger = m_data->Stores.at("ANNIEEvent")->Get("TriggerWord",fTrigger);
+  int fTrigger=5;
+  bool get_trigger=true;
+  //auto get_trigger = m_data->Stores.at("ANNIEEvent")->Get("TriggerWord",fTrigger);
   if (not get_trigger){
       Log("EventSelector Tool: Error retrieving Triggerword, true from ANNIEEvent!",v_error,verbosity);
       return false;
   }
-
   bool IsSingleRing = false, IsMultiRing = false, HasProjectedMRDHit = false, passNoPiK = false, passMCFVCut = false, passMCPMTCut = false, passMCMRDCut = false, IsInsideEnergyWindow = false, IsElectron = false, IsMuon = false, isPromptTrigger=false;
  
   if (fIsMC){

@@ -62,21 +62,12 @@ def Finalise():
     
 
 def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, predictionsdatafilename=None, firstfilesentries=None, predictionsdatafilename2=None):
-
+    '''
     print("DNNFindTrackLengthInWater_test.py Executing")
     
     # Load Data
     #-----------------------------
     #print( "--- loading input variables from store!")
-    '''
-    hit_lambdas = Store.GetStoreVariable('EnergyReco','lambda_vec')  # std::vectors in the Store are returned
-    hit_times = Store.GetStoreVariable('EnergyReco','digit_ts_vec')  # as python lists
-    lambdamax = Store.GetStoreVariable('EnergyReco','lambda_max')
-    num_pmt_hits = Store.GetStoreVariable('EnergyReco','num_pmt_hits')
-    num_lappd_hits = Store.GetStoreVariable('EnergyReco','num_lappd_hits')
-    features = np.concatenate([hit_lambdas,hit_times,lambdamax,num_pmt_hits,num_lappd_hits], axis=None)
-    labels = Store.GetStoreVariable('EnergyReco','TrueTrackLengthInWater')
-    '''
     #previous iteration of the test script, commented out to use above lines
     if Toolchain:
         testingdatafilename = Store.GetStoreVariable('Config','TrackLengthTestingDataFile')
@@ -93,18 +84,22 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     # convert to 2D numpy array
     print("converting to numpy array")
     TestingDataset = numpy.array(testfiledata)
-    
     # split the numpy array up into sub-arrays
     testfeatures, testlambdamax, testlabels, testrest = numpy.split(TestingDataset,[2203,2204,2205],axis=1)
-    
-    
-    
+    '''
+    hit_lambdas = Store.GetStoreVariable('EnergyReco','lambda_vec')  # std::vectors in the Store are returned
+    hit_times = Store.GetStoreVariable('EnergyReco','digit_ts_vec')  # as python lists
+    lambdamax = Store.GetStoreVariable('EnergyReco','lambda_max')    
+    num_pmt_hits = Store.GetStoreVariable('EnergyReco','num_pmt_hits')
+    num_lappd_hits = Store.GetStoreVariable('EnergyReco','num_lappd_hits')
+    features = np.concatenate([hit_lambdas,hit_times,lambdamax,num_pmt_hits,num_lappd_hits], axis=None)
+    labels = Store.GetStoreVariable('EnergyReco','TrueTrackLengthInWater')
+    '''
     # print info
     print( "lambdamax ", testlambdamax[:2], testlabels[:2])
     #print(testfeatures[0])
     num_events, num_pixels = testfeatures.shape
     print(num_events, num_pixels)
-    
     # Preprocess data and load model
     #-----------------------------
     
@@ -118,7 +113,7 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     scaler = preprocessing.StandardScaler()
     x_transformed = scaler.fit_transform(test_x)  # are we ok doing fit_transform on test data?
     # scale the features
-    testfeatures_transformed = scaler.transform(testfeatures)
+    features_transformed = scaler.transform(testfeatures)
     
     # define keras model, loading weight from weights file
     print("defining the model")
@@ -159,6 +154,14 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     
     # firstly, maybe we don't want to save the predictions at all. See if we've been given at least one file:
     if Toolchain:
+         evtnum = Store.GetStoreVariable('ANNIEEvent','EventNumber')
+    if evtnum==0:
+        sum_square_errors = 0
+    else:
+        sum_square_errors = Store.GetStoreVariable('EnergyReco','TrackLengthInWaterSumSquaredErrors')
+    sum_square_errors += ((y_predicted-test_y)**2.)
+    Store.SetStoreVariable('EnergyReco','DNNRecoLength',y_predicted)
+    Store.SetStoreVariable('EnergyReco','TrackLengthInWaterSumSquaredErrors',sum_square_errors)
         predictionsdatafilename = Store.GetStoreVariable('Config','TrackLengthPredictionsDataFile')
     if (predictionsdatafilename is None) or ( predictionsdatafilename == ''):
         # no output files today
@@ -196,9 +199,8 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     K.clear_session()
     
     print("done; returning")
-    
+    '''    
     return 1
-
 if __name__ == "__main__":
     # Make the script runnable as a standalone python script too?
     testingdatafilename = '/ToolAnalysisLink/Data_Energy_Reco/Output/DNN_testing_input.csv'
