@@ -1,7 +1,7 @@
 #LoadWCSim Config File
 # all variables retrieved with m_variables.Get() must be defined here!
 
-verbose 1
+verbose 0
 HistoricTriggeroffset 0
 WCSimVersion 10
 InputFile Data_Energy_Reco/beamlikemu/pmt/wcsim_beamlike_muon_0.20*.root

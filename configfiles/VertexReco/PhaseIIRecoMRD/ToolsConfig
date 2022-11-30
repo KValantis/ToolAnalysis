@@ -10,5 +10,4 @@ EventSelector EventSelector ./configfiles/VertexReco/PhaseIIRecoMRD/EventSelecto
 FindMrdTracks FindMrdTracks ./configfiles/VertexReco/PhaseIIRecoMRD/FindMrdTracksConfig
 VtxSeedGenerator VtxSeedGenerator ./configfiles/VertexReco/PhaseIIRecoMRD/VtxSeedGeneratorConfig
 VtxExtendedVertexFinder VtxExtendedVertexFinder ./configfiles/VertexReco/PhaseIIRecoMRD/VtxExtendedVertexFinderConfig
-#insert calc
 PhaseIITreeMaker PhaseIITreeMaker ./configfiles/VertexReco/PhaseIIRecoMRD/PhaseIITreeMakerConfig
