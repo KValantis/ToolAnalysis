@@ -137,9 +137,8 @@ bool EventSelector::Execute(){
 
   }
 
-  int fTrigger=5;
-  bool get_trigger=true;
-  //auto get_trigger = m_data->Stores.at("ANNIEEvent")->Get("TriggerWord",fTrigger);
+  int fTrigger;
+  auto get_trigger = m_data->Stores.at("ANNIEEvent")->Get("TriggerWord",fTrigger);
   if (not get_trigger){
       Log("EventSelector Tool: Error retrieving Triggerword, true from ANNIEEvent!",v_error,verbosity);
       return false;
