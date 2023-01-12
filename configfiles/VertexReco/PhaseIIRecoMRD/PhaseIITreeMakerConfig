@@ -7,11 +7,10 @@ MCTruth_fill 1
 muonTruthRecoDiff_fill 1
 pionKaonCount_fill 1
 TankHitInfo_fill 1
-MRDHitInfo_fill 0
+MRDHitInfo_fill 1
 TankRecoDigitInfo_fill 1
 fillCleanEventsOnly 0
 MRDReco_fill 1
 TriggerProcessing 1
 
 OutputFile Data_Energy_Reco/vtxreco-beamlikewithmrdtracks2.root
-NumEventsWritten 2000

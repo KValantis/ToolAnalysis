@@ -752,6 +752,37 @@ bool PhaseIITreeMaker::Execute(){
         std::cout << "PhaseIITreeMaker tool: No MRD clusters found.  Will be no tracks." << std::endl;
         return false;
       }
+      if(MrdTimeClusters.size()<1){
+      Position StartVertex1;
+  Position StopVertex1;
+  double TrackLength1 = -9999;
+  double TrackAngle1 = -9999;
+  double TrackAngleError1 = -9999;
+  double PenetrationDepth1 = -9999;
+  Position MrdEntryPoint1;
+  double EnergyLoss1 = -9999; //in MeV
+  double EnergyLossError1 = -9999;
+  double EntryPointRadius1 = -9999;
+  bool IsMrdPenetrating1;
+  bool IsMrdStopped1;
+  bool IsMrdSideExit1;
+  fMRDTrackAngle.push_back(TrackAngle1);
+    fMRDTrackAngleError.push_back(TrackAngleError1);
+    fMRDTrackLength.push_back(TrackLength1);
+    fMRDPenetrationDepth.push_back(PenetrationDepth1);
+    fMRDEntryPointRadius.push_back(EntryPointRadius1);
+    fMRDEnergyLoss.push_back(EnergyLoss1);
+    fMRDEnergyLossError.push_back(EnergyLossError1);
+    fMRDTrackStartX.push_back(StartVertex1.X());
+    fMRDTrackStartY.push_back(StartVertex1.Y());
+    fMRDTrackStartZ.push_back(StartVertex1.Z());
+    fMRDTrackStopX.push_back(StopVertex1.X());
+    fMRDTrackStopY.push_back(StopVertex1.Y());
+    fMRDTrackStopZ.push_back(StopVertex1.Z());
+    fMRDStop.push_back(IsMrdStopped1);
+    fMRDSide.push_back(IsMrdSideExit1);
+    fMRDThrough.push_back(IsMrdPenetrating1);
+      }
       for(int i=0; i < (int) MrdTimeClusters.size(); i++) fNumClusterTracks += this->LoadMRDTrackReco(i);
     }
 
@@ -1216,6 +1247,27 @@ int PhaseIITreeMaker::LoadMRDTrackReco(int SubEventID) {
   bool IsMrdSideExit;
 
   int NumClusterTracks = 0;
+  if(numtracksinev<1){
+    if(fMRDTrackAngle.empty()){
+    fMRDTrackAngle.push_back(TrackAngle);
+    fMRDTrackAngleError.push_back(TrackAngleError);
+    fMRDTrackLength.push_back(TrackLength);
+    fMRDPenetrationDepth.push_back(PenetrationDepth);
+    fMRDEntryPointRadius.push_back(EntryPointRadius);
+    fMRDEnergyLoss.push_back(EnergyLoss);
+    fMRDEnergyLossError.push_back(EnergyLossError);
+    fMRDTrackStartX.push_back(StartVertex.X());
+    fMRDTrackStartY.push_back(StartVertex.Y());
+    fMRDTrackStartZ.push_back(StartVertex.Z());
+    fMRDTrackStopX.push_back(StopVertex.X());
+    fMRDTrackStopY.push_back(StopVertex.Y());
+    fMRDTrackStopZ.push_back(StopVertex.Z());
+    fMRDStop.push_back(IsMrdStopped);
+    fMRDSide.push_back(IsMrdSideExit);
+    fMRDThrough.push_back(IsMrdPenetrating);
+    }
+    }
+  else{
   for(int tracki=0; tracki<numtracksinev; tracki++){
     BoostStore* thisTrackAsBoostStore = &(theMrdTracks->at(tracki));
     int TrackEventID = -1; 
@@ -1259,6 +1311,7 @@ int PhaseIITreeMaker::LoadMRDTrackReco(int SubEventID) {
     fMRDSide.push_back(IsMrdSideExit);
     fMRDThrough.push_back(IsMrdPenetrating);
     NumClusterTracks+=1;
+}
 }
   return NumClusterTracks;
 }
