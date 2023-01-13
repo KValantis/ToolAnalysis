@@ -19,7 +19,10 @@ export PATH=$GENIE/bin:$PATH
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/ToolDAQ/RATEventLib/src
 export ROOT_INCLUDE_PATH=$PWD/UserTools/PlotWaveforms:$ROOT_INCLUDE_PATH
 
-for folder in `ls -d ${ToolDAQapp}/UserTools/*/ `
+export PATH=/ToolAnalysis/ToolDAQ/fsplit:$PATH
+export TF_CPP_MIN_LOG_LEVEL=2
+
+for folder in `ls -d ${PWD}/UserTools/*/ `
 do
     export PYTHONPATH=$folder:${PYTHONPATH}
 done
