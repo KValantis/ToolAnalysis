@@ -28,7 +28,7 @@ class FindTrackLengthInWater: public Tool {
   bool first=1; bool deny_access=0;
   // counters to keep track of cut efficiencies
   int count1=0, count2=0, count3=0, count4=0, count5=0;
-  
+  std::ofstream csvfile;
   Geometry* anniegeom=nullptr;
   double tank_radius;
   double tank_halfheight;

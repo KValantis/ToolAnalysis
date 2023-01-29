@@ -17,6 +17,52 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
   m_variables.Get("verbosity",verbosity);
   Log("FindTrackLengthInWater Tool: Initializing",v_message,verbosity);
 
+  std::string OutputDataFile;
+    get_ok = m_variables.Get("OutputDataFile",OutputDataFile);
+  if(not get_ok){
+    Log("FindTrackLengthInWater Tool: No OutputDataFile specified, will not be written",v_error,verbosity);
+    return false;
+  }
+  // Write the file header(s)
+  // ========================
+    // write header row
+    csvfile.open(OutputDataFile,std::fstream::out);
+    if(!csvfile.is_open()){
+     Log("FinDTrackLengthInWater Tool: Failed to open "+OutputDataFile+" for writing headers",v_error,verbosity);
+    }
+    for (int i=0; i<maxhits0;++i){
+       csvfile<<"l_"<<i<<",";
+    }
+    for (int i=0; i<maxhits0;++i){
+       csvfile<<"T_"<<i<<",";
+    }
+    csvfile<<"lambda_max,"  //first estimation of track length(using photons projection on track)
+           //<<"digitT,"
+           <<"totalPMTs,"   // number of PMT hits, not number of pmts.
+           <<"totalLAPPDs," // number of LAPPD hits... 
+           <<"lambda_max,"  // ... again...?
+           <<"TrueTrackLengthInWater,"
+           //<<"neutrinoE,"
+           <<"trueKE,"      // of the primary muon
+           <<"diffDirAbs,"
+           <<"TrueTrackLengthInMrd,"
+           <<"recoDWallR,"
+           <<"recoDWallZ,"
+           <<"dirX,"        // of the reconstructed muon
+           <<"dirY,"
+           <<"dirZ,"
+           <<"vtxX,"        // of the reconstructed event
+           <<"vtxY,"
+           <<"vtxZ,"
+           <<"recoVtxFOM,"
+           <<"recoTrackLengthInMrd"
+           //<<"recoStatus,"
+           //<<"deltaVtxR,"
+           //<<"deltaAngle"
+           <<'\n';
+    csvfile.close();
+    
+  csvfile.open(OutputDataFile,std::fstream::app);  // open file for writing events
   // make the BoostStore to hold the outputs
   BoostStore* energystore = new BoostStore(true,0); // type is single-event binary file
   m_data->Stores.emplace("EnergyReco",energystore);
@@ -302,7 +348,86 @@ bool FindTrackLengthInWater::Execute(){
         m_data->Stores.at("EnergyReco")->Set("recoStatus",recoStatus);
         m_data->Stores.at("EnergyReco")->Set("deltaVtxR",deltaVtxR);
         m_data->Stores.at("EnergyReco")->Set("deltaAngle",deltaAngle);
-        
+
+//Get the reco MRDTrackLength
+std::vector<std::vector<int>> MrdTimeClusters;
+std::vector<BoostStore>* theMrdTracks;
+int numtracksinev;
+double MRDTrackLength;
+Position StartVertex;
+Position StopVertex;
+bool get_clusters = m_data->CStore.Get("MrdTimeClusters",MrdTimeClusters);
+      if(!get_clusters){
+        std::cout << "FindTrackLengthInWater tool: No MRD clusters found.  Will be no tracks." << std::endl;
+        return false;
+      }
+      if(MrdTimeClusters.size()<1){
+      MRDTrackLength = -9999;
+      }
+      for(int i=0; i < (int) MrdTimeClusters.size(); i++){
+      m_data->Stores["MRDTracks"]->Get("MRDTracks",theMrdTracks);
+      m_data->Stores["MRDTracks"]->Get("NumMrdTracks",numtracksinev);
+      if(numtracksinev<1){
+      MRDTrackLength = -9999;
+      }
+      for(int tracki=0; tracki<numtracksinev; tracki++){
+    BoostStore* thisTrackAsBoostStore = &(theMrdTracks->at(tracki));
+    int TrackEventID = -1; 
+    //get track properties that are needed for the through-going muon selection
+	thisTrackAsBoostStore->Get("MrdSubEventID",TrackEventID);
+    if(TrackEventID!= i) continue;
+    thisTrackAsBoostStore->Get("StartVertex",StartVertex);
+    thisTrackAsBoostStore->Get("StopVertex",StopVertex);
+    MRDTrackLength = sqrt(pow((StopVertex.X()-StartVertex.X()),2)+pow(StopVertex.Y()-StartVertex.Y(),2)+pow(StopVertex.Z()-StartVertex.Z(),2)) * 100.0;
+      }
+      }
+//---------------------------------------------------------------------------------------------------------------------------------------------------------//
+  if(lambda_vector.size()!=maxhits0){
+    Log("FindTrackLengthInWater Tool: Error! lambdavector size is not maxhits0! Check dimensions!",v_error,verbosity);
+    return false;
+  }
+  if(digitT.size()!=maxhits0){
+    Log("FindTrackLengthInWater Tool: Error! digitT size is not maxhits0! Check dimensions!",v_error,verbosity);
+    return false;
+  }
+  
+  // Write to .csv file
+  // ==================
+  if(not csvfile.is_open()){
+     Log("FindTrackLengthInWater Tool: output file is closed, skipping write",v_debug,verbosity);
+     return true;
+  }
+  for(int i=0; i<maxhits0;++i){
+     csvfile<<lambda_vector.at(i)<<",";
+  }
+  for(int i=0; i<maxhits0;++i){
+     csvfile<<digitT.at(i)<<",";
+  }
+  csvfile<<lambda_max<<","
+         <<totalPMTs<<","
+         <<totalLAPPDs<<","
+         <<lambda_max<<","
+         <<TrueTrackLengthInWater2<<","
+         //<<TrueNeutrinoEnergy<<","
+         <<trueEnergy<<","
+         <<diffDirAbs2<<","
+         <<TrueTrackLengthInMrd2<<","
+         <<recoDWallR2<<","
+         <<recoDWallZ2<<","
+         <<theExtendedVertex->GetDirection().X()<<","
+         <<theExtendedVertex->GetDirection().Y()<<","
+         <<theExtendedVertex->GetDirection().Z()<<","
+         <<theExtendedVertex->GetPosition().X()<<","
+         <<theExtendedVertex->GetPosition().Y()<<","
+         <<theExtendedVertex->GetPosition().Z()<<","
+         <<recoVtxFOM<<","
+         <<MRDTrackLength
+         //<<recoStatus<<","
+         //<<deltaVtxR<<","
+         //<<deltaAngle
+         <<'\n';
+  //++entries_written;
+
   return true;
 }
 
@@ -360,6 +485,7 @@ double FindTrackLengthInWater::find_lambda(double xmu_rec,double ymu_rec,double 
 }
 
 bool FindTrackLengthInWater::Finalise(){
+ if(csvfile.is_open()) csvfile.close();
   Log("FindTrackLengthInWater Tool: processed "+to_string(count1)+" events",v_message,verbosity);
   std::cout<<"processed a total of "<<count4<<" events, of which "
            <<count2<<" passed event selection cuts, "<<count3

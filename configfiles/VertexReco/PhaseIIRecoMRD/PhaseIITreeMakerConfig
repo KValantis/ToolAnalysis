@@ -13,4 +13,4 @@ fillCleanEventsOnly 0
 MRDReco_fill 1
 TriggerProcessing 1
 
-OutputFile Data_Energy_Reco/vtxreco-beamlikewithmrdtracks22.root
+OutputFile Data_Energy_Reco/vtxreco-beamlikewithmrdtracks19.root

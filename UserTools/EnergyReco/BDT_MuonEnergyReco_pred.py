@@ -78,9 +78,11 @@ def Execute(Toolchain=True, inputdatafilename=None, E_threshold=None, modelfilen
     #vtxY=dirVec->GetPosition().Y()
     #vtxZ=dirVec->GetPosition().Z()
     #DNNRecoLength=Store.GetStoreVariable('EnergyReco',)
-    df0=df00[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater','neutrinoE','trueKE','diffDirAbs','TrueTrackLengthInMrd','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
-    dfsel=df0.loc[df0['neutrinoE'] < E_threshold]
-
+    df0=df00[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater',#'neutrinoE',
+    'trueKE','diffDirAbs','recoTrackLengthInMRD','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
+    #dfsel=df0.loc[df0['neutrinoE'] < E_threshold]
+    dfsel=df0
+    
     #print to check:
     print("check training sample: ",dfsel.head())
 #    print(dfsel.iloc[5:10,0:5])
@@ -91,8 +93,10 @@ def Execute(Toolchain=True, inputdatafilename=None, E_threshold=None, modelfilen
     filein2 = open(str(inputdatafilename))
     print(filein2)
     df00b = pd.read_csv(filein2)
-    df0b=df00b[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater','neutrinoE','trueKE','diffDirAbs','TrueTrackLengthInMrd','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
+    df0b=df00b[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater',#'neutrinoE',
+    'trueKE','diffDirAbs','recoTrackLengthInMRD','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
     dfsel_pred=df0b.loc[df0['neutrinoE'] < E_threshold]
+    dfsel_pred=df0b
     #print to check:
     print("check predicting sample: ",dfsel_pred.shape," ",dfsel_pred.head())
 #    print(dfsel_pred.iloc[5:10,0:5])
@@ -100,13 +104,13 @@ def Execute(Toolchain=True, inputdatafilename=None, E_threshold=None, modelfilen
     assert(dfsel_pred.isnull().any().any()==False)
 
     #--- normalisation-training sample:
-    dfsel_n = pd.DataFrame([ dfsel['DNNRecoLength']/600., dfsel['TrueTrackLengthInMrd']/200., dfsel['diffDirAbs'], dfsel['recoDWallR']/152.4, dfsel['recoDWallZ']/198., dfsel['totalLAPPDs']/1000., dfsel['totalPMTs']/1000., dfsel['vtxX']/150., dfsel['vtxY']/200., dfsel['vtxZ']/150. ]).T
+    dfsel_n = pd.DataFrame([ dfsel['DNNRecoLength']/600., dfsel['recoTrackLengthInMrd']/200., dfsel['diffDirAbs'], dfsel['recoDWallR']/152.4, dfsel['recoDWallZ']/198., dfsel['totalLAPPDs']/1000., dfsel['totalPMTs']/1000., dfsel['vtxX']/150., dfsel['vtxY']/200., dfsel['vtxZ']/150. ]).T
     print("chehck normalisation: ", dfsel_n.head())
     #--- normalisation-sample for prediction:
-    dfsel_pred_n = pd.DataFrame([ dfsel_pred['DNNRecoLength']/600., dfsel_pred['TrueTrackLengthInMrd']/200., dfsel_pred['diffDirAbs'], dfsel_pred['recoDWallR']/152.4, dfsel_pred['recoDWallZ']/198., dfsel_pred['totalLAPPDs']/1000., dfsel_pred['totalPMTs']/1000., dfsel_pred['vtxX']/150., dfsel_pred['vtxY']/200., dfsel_pred['vtxZ']/150. ]).T
+    dfsel_pred_n = pd.DataFrame([ dfsel_pred['DNNRecoLength']/600., dfsel_pred['recoTrackLengthInMRD']/200., dfsel_pred['diffDirAbs'], dfsel_pred['recoDWallR']/152.4, dfsel_pred['recoDWallZ']/198., dfsel_pred['totalLAPPDs']/1000., dfsel_pred['totalPMTs']/1000., dfsel_pred['vtxX']/150., dfsel_pred['vtxY']/200., dfsel_pred['vtxZ']/150. ]).T
 
     #--- prepare training & test sample for BDT:
-    arr_hi_E0 = np.array(dfsel_n[['DNNRecoLength','TrueTrackLengthInMrd','diffDirAbs','recoDWallR','recoDWallZ','totalLAPPDs','totalPMTs','vtxX','vtxY','vtxZ']])
+    arr_hi_E0 = np.array(dfsel_n[['DNNRecoLength','recoTrackLengthInMrd','diffDirAbs','recoDWallR','recoDWallZ','totalLAPPDs','totalPMTs','vtxX','vtxY','vtxZ']])
     arr3_hi_E0 = np.array(dfsel[['trueKE']])
  
     #---- random split of events ----

@@ -1,6 +1,6 @@
 # VtxSeedGenerator config file
 
-verbosity 1
-NumberOfSeeds 100
+verbosity 3
+NumberOfSeeds 300
 UseSeedGrid 1
 SeedType 2

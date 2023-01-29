@@ -7,5 +7,5 @@ TrackLengthWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets
 # output file for predictions, if we want to make a legacy-style csv output
 TrackLengthPredictionsDataFile Data_Energy_Reco/DNN_predict_output.csv  # use 'NA' to skip
 
-TrackLengthTestingDataFile Data_Energy_Reco/Output/DNN_training_input.csv
+TrackLengthTestingDataFile Data_Energy_Reco/data_for_RecoLength.csv
 TrackLengthWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets.hdf5

@@ -52,7 +52,7 @@ from tensorflow.keras import backend as K
 import pprint
 #def Initialise(pyinit):
 def Initialise(pyinit):
-    print("Initialising DNNFindTrackLengthInWater_test.py")
+    print("Initialising DNNFindTrackLengthInWater_pred.py")
     #print("Listing what's in globals")
     #pprint.pprint(globals())
     return 1
@@ -62,8 +62,7 @@ def Finalise():
     
 
 def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, predictionsdatafilename=None, firstfilesentries=None, predictionsdatafilename2=None):
-    '''
-    print("DNNFindTrackLengthInWater_test.py Executing")
+    print("DNNFindTrackLengthInWater_pred.py Executing")
     
     # Load Data
     #-----------------------------
@@ -162,7 +161,7 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     sum_square_errors += ((y_predicted-test_y)**2.)
     Store.SetStoreVariable('EnergyReco','DNNRecoLength',y_predicted)
     Store.SetStoreVariable('EnergyReco','TrackLengthInWaterSumSquaredErrors',sum_square_errors)
-        predictionsdatafilename = Store.GetStoreVariable('Config','TrackLengthPredictionsDataFile')
+    predictionsdatafilename = Store.GetStoreVariable('Config','TrackLengthPredictionsDataFile')
     if (predictionsdatafilename is None) or ( predictionsdatafilename == ''):
         # no output files today
         print("no output file specified, not writing to file")
@@ -198,8 +197,7 @@ def Execute(Toolchain=True, testingdatafilename=None, weightsfilename=None, pred
     print("clearing session")
     K.clear_session()
     
-    print("done; returning")
-    '''    
+    print("done; returning")    
     return 1
 if __name__ == "__main__":
     # Make the script runnable as a standalone python script too?
