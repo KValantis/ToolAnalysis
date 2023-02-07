@@ -25,7 +25,8 @@ tensorflow.random.set_seed(1234)
 #sess = tensorflow.Session(graph=tensorflow.get_default_graph(), config=session_conf)
 #K.set_session(sess)
 
-import Store
+#import Store
+from Tool import *
 import sys
 import glob
 #import numpy #as np
