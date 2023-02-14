@@ -1,5 +1,13 @@
 # This config file stores variables that may be retrieved by the python script
-# Access them by retrieving the corresponding variable from the 'Config' store
+# Also this is a caller config file
+
+PythonScript DNNTrackLengthPredict
+
+verbose 1
+
+InitialiseFunction Initialise
+ExecuteFunction Finalise
+FinaliseFunction Execute
 
 # model weights file
 TrackLengthWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets.hdf5
@@ -8,4 +16,3 @@ TrackLengthWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets
 TrackLengthPredictionsDataFile Data_Energy_Reco/DNN_predict_output.csv  # use 'NA' to skip
 
 TrackLengthTestingDataFile Data_Energy_Reco/data_for_RecoLength.csv
-TrackLengthWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets.hdf5

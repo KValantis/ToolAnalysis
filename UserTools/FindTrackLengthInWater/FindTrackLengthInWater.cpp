@@ -181,7 +181,7 @@ bool FindTrackLengthInWater::Execute(){
    // get additional primary muon info
    Log("FindTrackLengthInWater Tool: Getting primary muon info",v_debug,verbosity);
    double TrueTrackLengthInWater = primarymuon->GetTrackLengthInTank();
-   trueEnergy = 1000.*primarymuon->GetStartEnergy();  // [MeV]
+   trueEnergy = 1.*primarymuon->GetStartEnergy();  // [MeV]
    deltaVtxR = 100.*(theExtendedVertex->GetPosition()-primarymuon->GetStartVertex()).Mag();
    double cosphi = primarymuon->GetStartDirection().X()*dirX+
                    primarymuon->GetStartDirection().Y()*dirY+
