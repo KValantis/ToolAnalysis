@@ -282,8 +282,6 @@ bool FindTrackLengthInWater::Execute(){
         double recoVtxR2 = vtxX*vtxX + vtxZ*vtxZ;//vtxY*vtxY;
         double recoDWallR = tank_radius-TMath::Sqrt(recoVtxR2);   // FIXME is this coordinate-system
         double recoDWallZ = tank_halfheight-TMath::Abs(vtxY);     // dependant? Is it subtracting tank origin
-
-
 	// Estimate the track length
 	// =========================
         Log("FindTrackLengthInWater Tool: Estimating track length in tank",v_debug,verbosity);
@@ -414,12 +412,12 @@ bool get_clusters = m_data->CStore.Get("MrdTimeClusters",MrdTimeClusters);
          <<TrueTrackLengthInMrd2<<","
          <<recoDWallR2<<","
          <<recoDWallZ2<<","
-         <<theExtendedVertex->GetDirection().X()<<","
-         <<theExtendedVertex->GetDirection().Y()<<","
-         <<theExtendedVertex->GetDirection().Z()<<","
-         <<theExtendedVertex->GetPosition().X()<<","
-         <<theExtendedVertex->GetPosition().Y()<<","
-         <<theExtendedVertex->GetPosition().Z()<<","
+         <<dirX<<","
+         <<dirY<<","
+         <<dirZ<<","
+         <<vtxX<<","
+         <<vtxY<<","
+         <<vtxZ<<","
          <<recoVtxFOM<<","
          <<MRDTrackLength
          //<<recoStatus<<","
