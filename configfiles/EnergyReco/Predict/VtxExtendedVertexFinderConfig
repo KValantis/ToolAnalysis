@@ -1,7 +1,7 @@
 # VtxPointPositionFinder config file
 
 verbosity 5
-UseTrueVertexAsSeed 0
+UseTrueVertexAsSeed 1
 UsePointVertexAsSeed 0
-FitAllOnSeedGrid 1
+FitAllOnSeedGrid 0
 UseMeanTimeAsSeed 0

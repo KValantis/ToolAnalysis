@@ -130,11 +130,11 @@ bool DigitBuilder::Execute(){
       return false;
     }
     ///DELETE THESE COMMENTS FOR LAPPD WORK
-    //auto get_mclappdhits = m_data->Stores.at("ANNIEEvent")->Get("MCLAPPDHits",fMCLAPPDHits);
-    //if(!get_mclappdhits){
-    //  Log("DigitBuilder Tool: Error retrieving MCLAPPDHits from ANNIEEvent!",v_error,verbosity); 
-    //  return false;
-    //}
+    auto get_mclappdhits = m_data->Stores.at("ANNIEEvent")->Get("MCLAPPDHits",fMCLAPPDHits);
+    if(!get_mclappdhits){
+      Log("DigitBuilder Tool: Error retrieving MCLAPPDHits from ANNIEEvent!",v_error,verbosity); 
+      return false;
+    }
   } else {
     auto get_clusters =  m_data->CStore.Get("ClusterMap",m_all_clusters);
     if (!get_clusters){
