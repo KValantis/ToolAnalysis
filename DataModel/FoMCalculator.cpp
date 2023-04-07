@@ -96,10 +96,6 @@ void FoMCalculator::ConePropertiesFoM(double coneEdge, double& coneFOM)
   double digitCharge = 0.0;
   double coneCharge = 0.0;
   double allCharge = 0.0;
-  double outerCone = -99.9;
-  int outhits = 0;
-  int inhits = 0;
-
   double fom = -9999.;
 
   for( int idigit=0; idigit<this->fVtxGeo->GetNDigits(); idigit++ ){ 	
@@ -109,26 +105,20 @@ void FoMCalculator::ConePropertiesFoM(double coneEdge, double& coneFOM)
 
       if( deltaAngle<=0.0 ){
         coneCharge += digitCharge*( 0.75 + 0.25/( 1.0 + (deltaAngle*deltaAngle)/(coneEdgeLow*coneEdgeLow) ) );
-	inhits++;	
+	//inhits++;	
         //if (deltaAngle > outerCone) outerCone = deltaAngle;
       }
       else{
         coneCharge += digitCharge*( 0.00 + 1.00/( 1.0 + (deltaAngle*deltaAngle)/(coneEdgeHigh*coneEdgeHigh) ) );
-	outhits++;
-        //outerCone = 0;
+	//outhits++;
       }
 
       allCharge += digitCharge;
-      outerCone = -outhits/inhits;
     }
   }
 
   if( allCharge>0.0 ){
-    if( outerCone>-42 ){
-      fom = fBaseFOM*coneCharge/allCharge/*exp(outerCone)*/;
-    }else{
       fom = fBaseFOM*coneCharge/allCharge;
-    }
   }
 
   // return figure of merit
