@@ -96,7 +96,6 @@ void FoMCalculator::ConePropertiesFoM(double coneEdge, double& coneFOM)
   double digitCharge = 0.0;
   double coneCharge = 0.0;
   double allCharge = 0.0;
-
   double fom = -9999.;
 
   for( int idigit=0; idigit<this->fVtxGeo->GetNDigits(); idigit++ ){ 	
@@ -106,9 +105,12 @@ void FoMCalculator::ConePropertiesFoM(double coneEdge, double& coneFOM)
 
       if( deltaAngle<=0.0 ){
         coneCharge += digitCharge*( 0.75 + 0.25/( 1.0 + (deltaAngle*deltaAngle)/(coneEdgeLow*coneEdgeLow) ) );
+	//inhits++;	
+        //if (deltaAngle > outerCone) outerCone = deltaAngle;
       }
       else{
         coneCharge += digitCharge*( 0.00 + 1.00/( 1.0 + (deltaAngle*deltaAngle)/(coneEdgeHigh*coneEdgeHigh) ) );
+	//outhits++;
       }
 
       allCharge += digitCharge;
@@ -116,7 +118,7 @@ void FoMCalculator::ConePropertiesFoM(double coneEdge, double& coneFOM)
   }
 
   if( allCharge>0.0 ){
-    fom = fBaseFOM*coneCharge/allCharge;
+      fom = fBaseFOM*coneCharge/allCharge;
   }
 
   // return figure of merit
@@ -335,6 +337,8 @@ void FoMCalculator::ExtendedVertexChi2(double vtxX, double vtxY, double vtxZ, do
   return;
 }
 
+
+
 //KEPT FOR HISTORY, BUT FITTER IS CURRENTLY NOT WORKING
 //void FoMCalculator::CorrectedVertexChi2(double vtxX, double vtxY, double vtxZ, double dirX, double dirY, double dirZ, double& vtxAngle, double& vtxTime, double& fom)
 //{  
@@ -526,4 +530,3 @@ void FoMCalculator::ExtendedVertexChi2(double vtxX, double vtxY, double vtxZ, do
 //
 //  return;
 //}
-
