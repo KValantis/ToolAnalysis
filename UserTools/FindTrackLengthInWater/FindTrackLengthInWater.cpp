@@ -216,6 +216,8 @@ bool FindTrackLengthInWater::Execute(){
    // get digits from RecoDigit store
    std::vector<RecoDigit>* digitList;
    m_data->Stores.at("RecoEvent")->Get("RecoDigit", digitList);
+   // Extract the PMT & LAPPD hit information
+   // ===============================
    int totalPMTs =0; // number of digits from PMT hits in the event
    /*Position detector_center=anniegeom->GetTankCentre();
    double tank_center_x = detector_center.X();
@@ -247,12 +249,15 @@ bool FindTrackLengthInWater::Execute(){
       if (it_tank_mc == (*MCHits).end()) loop_tank = false;
      }*/
      //
-   totalPMTs += digitList->size();
+     
+  int totalLAPPDs = 0; // number of digits from LAPPD hits in the event
   for(RecoDigit &adigit : *digitList){
 	  digitX.push_back(adigit.GetPosition().X());
 	  digitY.push_back(adigit.GetPosition().Y());
 	  digitZ.push_back(adigit.GetPosition().Z());
 	  digitT.push_back(adigit.GetCalTime());
+	  if(adigit.GetDigitType()==0){totalPMTs+=1;} //when the digit type is zero we have a PMT hit
+	  else{totalLAPPDs+=1;}// when it is 1 we have LAPPD
   }
    
    //Log("FindTrackLengthInWater Tool: Getting lappd hits",v_debug,verbosity);
@@ -294,7 +299,6 @@ bool FindTrackLengthInWater::Execute(){
    std::cout<<"this is totalPMTs"<<totalPMTs<<std::endl;
    // Extract the LAPPD hit information
    // =================================
-   int totalLAPPDs = 0; // number of LAPPD hits in the event
    
    //FIXME for LAPPD work remove the bellow comments
 	//Log("TotalLightMap Tool: Looping over LAPPDs with a hit",v_debug,verbosity);

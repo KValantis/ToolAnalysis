@@ -2,4 +2,4 @@
 # all variables retrieved with m_variables.Get() must be defined here!
 verbosity 1
 MaxTotalHitsToDNN 1100
-OutputDataFile Data_Energy_Reco/data_for_RecoLength.csv
+OutputDataFile Data_Energy_Reco/data_for_trackLength_training.csv
