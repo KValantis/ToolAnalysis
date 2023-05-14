@@ -16,7 +16,7 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
   // get configuration variables for this tool
   m_variables.Get("verbosity",verbosity);
   Log("FindTrackLengthInWater Tool: Initializing",v_message,verbosity);
-
+  
   std::string OutputDataFile;
     get_ok = m_variables.Get("OutputDataFile",OutputDataFile);
   if(not get_ok){
@@ -64,10 +64,11 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
     csvfile.close();
     
   csvfile.open(OutputDataFile,std::fstream::app);  // open file for writing events
-  // make the BoostStore to hold the outputs
-  BoostStore* energystore = new BoostStore(true,0); // type is single-event binary file
+  
+  //Create BoostStore to store the variables for track length and energy reco
+  BoostStore* energystore = new BoostStore(true,2); // type is multi-entry binary file
   m_data->Stores.emplace("EnergyReco",energystore);
-
+  
   // Get values from Config file
   // ===========================
   get_ok = m_variables.Get("MaxTotalHitsToDNN",maxhits0);
@@ -79,19 +80,19 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
   if(maxhits0>1100){
     std::cerr<<" Please change the dim of double lambda_vec[1100]={0.}; double digitt[1100]={0.}; from 1100 to max number of hits"<<std::endl;
   }
-  // put max nhits into store for use in the next tool
-  m_data->Stores.at("EnergyReco")->Set("MaxTotalHitsToDNN",maxhits0);
   
   // Get variables from ANNIEEvent
   // =============================
-  /*get_ok = m_data->Stores.at("ANNIEEvent")->Header->Get("AnnieGeometry",anniegeom);
+  get_ok = m_data->Stores.at("ANNIEEvent")->Header->Get("AnnieGeometry",anniegeom);
   if(not get_ok){
     Log("FindTrackLengthInWater Tool: No Geometry in ANNIEEvent!",v_error,verbosity);
     return false;
   }
   tank_radius = anniegeom->GetTankRadius()*100.;
+  std::cout<<"Tank radius is "<<tank_radius<<std::endl;
   tank_halfheight = anniegeom->GetTankHalfheight()*100.;
-  */
+  std::cout<<"Tank halfheight is "<<tank_halfheight<<std::endl;
+
   tank_radius=152.4;
   tank_halfheight=396.;
   return true;
@@ -369,40 +370,8 @@ bool FindTrackLengthInWater::Execute(){
        lambda_vector.resize(maxhits0);
        
        digitT.resize(maxhits0);
-       // put the last successfully processed event number in the EnergyReco store as well.
-       // write the current event to file
-       uint32_t EventNumber;
-       get_ok = m_data->Stores.at("ANNIEEvent")->Get("EventNumber", EventNumber);
        
-
-        // Put these variables in the EnergyReco BoostStore
-        // ================================================
-        Log("FindTrackLengthInWater Tool: putting event "+to_string(EventNumber)+" into the EnergyReco store",v_debug,verbosity);
-        m_data->Stores.at("EnergyReco")->Set("ThisEvtNum",EventNumber);
-        //std::cout<<"This is the Eventnumber you are looking for"<<EventNumber<<std::endl;
-        std::cout<<"This is the lambda_vec before being set into the boostStore"<<lambda_vector.size()<<std::endl;
-        for (int i=0; i < (int) lambda_vector.size(); i++){std::cout << lambda_vector.at(i)<<std::endl;}
-        Log("FindTrackLengthInWater Tool: lambda_vector: "+to_string(lambda_vector.size())+"  FINISHED",v_debug,verbosity);
-        m_data->Stores.at("EnergyReco")->Set("lambda_vec",lambda_vector);
-        m_data->Stores.at("EnergyReco")->Set("digit_ts_vec",digitT);
-        m_data->Stores.at("EnergyReco")->Set("lambda_max",lambda_max);
-        m_data->Stores.at("EnergyReco")->Set("num_pmt_hits",totalPMTs);
-        m_data->Stores.at("EnergyReco")->Set("num_lappd_hits",totalLAPPDs);
-        m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInWater",TrueTrackLengthInWater2);
-        m_data->Stores.at("EnergyReco")->Set("trueNeuE",TrueNeutrinoEnergy);
-        m_data->Stores.at("EnergyReco")->Set("trueE",trueEnergy);
-        m_data->Stores.at("EnergyReco")->Set("diffDirAbs2",diffDirAbs2);
-        m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInMrd2",TrueTrackLengthInMrd2);
-        m_data->Stores.at("EnergyReco")->Set("recoDWallR2",recoDWallR2);
-        m_data->Stores.at("EnergyReco")->Set("recoDWallZ2",recoDWallZ2);
-        m_data->Stores.at("EnergyReco")->Set("dirVec",theExtendedVertex->GetDirection());
-        m_data->Stores.at("EnergyReco")->Set("vtxVec",theExtendedVertex->GetPosition());
-        m_data->Stores.at("EnergyReco")->Set("recoVtxFOM",recoVtxFOM);
-        m_data->Stores.at("EnergyReco")->Set("recoStatus",recoStatus);
-        m_data->Stores.at("EnergyReco")->Set("deltaVtxR",deltaVtxR);
-        //m_data->Stores.at("EnergyReco")->Set("deltaAngle",deltaAngle);
-
-//Get the reco MRDTrackLength
+       //Get the reco MRDTrackLength
 std::vector<std::vector<int>> MrdTimeClusters;
 std::vector<BoostStore>* theMrdTracks;
 int numtracksinev;
@@ -439,6 +408,55 @@ bool get_clusters = m_data->CStore.Get("MrdTimeClusters",MrdTimeClusters);
     MRDTrackLength = sqrt(pow((StopVertex.X()-StartVertex.X()),2)+pow(StopVertex.Y()-StartVertex.Y(),2)+pow(StopVertex.Z()-StartVertex.Z(),2)) * 100.0;
       }
       }
+       
+       m_data->Stores.at("EnergyReco")->Delete();//clear the last entry from RAM
+       
+       // put max nhits into store for use in the next tool
+       m_data->Stores.at("EnergyReco")->Set("MaxTotalHitsToDNN",maxhits0);
+       
+       // put the last successfully processed event number in the EnergyReco store as well.
+       // write the current event to file
+       uint32_t EventNumber;
+       get_ok = m_data->Stores.at("ANNIEEvent")->Get("EventNumber", EventNumber);
+       
+
+        // Put these variables in the EnergyReco BoostStore
+        // ================================================
+        Log("FindTrackLengthInWater Tool: putting event "+to_string(EventNumber)+" into the EnergyReco store",v_debug,verbosity);
+        m_data->Stores.at("EnergyReco")->Set("ThisEvtNum",EventNumber);
+        //std::cout<<"This is the Eventnumber you are looking for"<<EventNumber<<std::endl;
+        std::cout<<"This is the lambda_vec before being set into the boostStore"<<lambda_vector.size()<<std::endl;
+        for (int i=0; i < (int) lambda_vector.size(); i++){std::cout << lambda_vector.at(i)<<std::endl;}
+        Log("FindTrackLengthInWater Tool: lambda_vector: "+to_string(lambda_vector.size())+"  FINISHED",v_debug,verbosity);
+        m_data->Stores.at("EnergyReco")->Set("lambda_vec",lambda_vector);
+        m_data->Stores.at("EnergyReco")->Set("digit_ts_vec",digitT);
+        m_data->Stores.at("EnergyReco")->Set("lambda_max",lambda_max);
+        m_data->Stores.at("EnergyReco")->Set("num_pmt_hits",totalPMTs);
+        m_data->Stores.at("EnergyReco")->Set("num_lappd_hits",totalLAPPDs);
+        m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInWater",TrueTrackLengthInWater2);
+        m_data->Stores.at("EnergyReco")->Set("trueNeuE",TrueNeutrinoEnergy);
+        m_data->Stores.at("EnergyReco")->Set("trueE",trueEnergy);
+        m_data->Stores.at("EnergyReco")->Set("diffDirAbs2",diffDirAbs2);
+        m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInMrd2",TrueTrackLengthInMrd2);
+        m_data->Stores.at("EnergyReco")->Set("recoDWallR2",recoDWallR2);
+        m_data->Stores.at("EnergyReco")->Set("recoDWallZ2",recoDWallZ2);
+        m_data->Stores.at("EnergyReco")->Set("dirVec",theExtendedVertex->GetDirection());
+        m_data->Stores.at("EnergyReco")->Set("vtxVec",theExtendedVertex->GetPosition());
+        m_data->Stores.at("EnergyReco")->Set("recoVtxFOM",recoVtxFOM);
+        m_data->Stores.at("EnergyReco")->Set("recoStatus",recoStatus);
+        m_data->Stores.at("EnergyReco")->Set("deltaVtxR",deltaVtxR);
+        m_data->Stores.at("EnergyReco")->Set("recoTrackLengthInMrd",MRDTrackLength);
+        //m_data->Stores.at("EnergyReco")->Set("deltaAngle",deltaAngle);
+
+int fDoTraining=0;
+  get_ok=m_variables.Get("DoTraining", fDoTraining);
+  if(not get_ok){
+    Log("FindTrackLengthInWater Tool: Not doing training, so BoostStore will not be saved locally",v_error,verbosity);
+    }
+// only save all data to disk when training
+if (fDoTraining){ 
+     m_data->Stores.at("EnergyReco")->Save("EnergyReco.bs");    // write this Energy Reco entry to disk. If the file exists, it appends as a new entry.
+     }     
 //---------------------------------------------------------------------------------------------------------------------------------------------------------//
   if(lambda_vector.size()!=maxhits0){
     Log("FindTrackLengthInWater Tool: Error! lambdavector size is not maxhits0! Check dimensions!",v_error,verbosity);
@@ -544,6 +562,7 @@ double FindTrackLengthInWater::find_lambda(double xmu_rec,double ymu_rec,double 
 }
 
 bool FindTrackLengthInWater::Finalise(){
+ m_data->Stores.at("EnergyReco")->Close();
  if(csvfile.is_open()) csvfile.close();
   Log("FindTrackLengthInWater Tool: processed "+to_string(count1)+" events",v_message,verbosity);
   std::cout<<"processed a total of "<<count4<<" events, of which "

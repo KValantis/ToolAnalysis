@@ -1,4 +1,5 @@
 # train machine learning algorithm
+#myLoadGeometry LoadGeometry configfiles/LoadGeometry/LoadGeometryConfig
 myLoadWCSim LoadWCSim configfiles/EnergyReco/Train_Test/LoadWCSimConfig
 myLoadWCSimLAPPD LoadWCSimLAPPD configfiles/EnergyReco/Train_Test/LoadWCSimLAPPDConfig
 myMCParticleProperties MCParticleProperties configfiles/EnergyReco/Train_Test/MCParticlePropertiesConfig
@@ -15,7 +16,7 @@ VtxExtendedVertexFinder VtxExtendedVertexFinder configfiles/EnergyReco/Train_Tes
 
 FindTrackLengthInWater FindTrackLengthInWater configfiles/EnergyReco/Train_Test/FindTrackLengthInWaterConfig
 #WriteTrainingCsvFiles WriteTrainingCsvFiles configfiles/EnergyReco/Train_Test/WriteTrainingCsvFilesConfig
-#DNNTrackLengthTrainer PythonScript configfiles/EnergyReco/Train_Test/DNNTrackLengthTrainCallerConfig
+#DNNTrackLengthTrainer PythonScript configfiles/EnergyReco/Train_Test/DNNTrackLengthTrainConfig
 #DNNTrackLengthTester PythonScript configfiles/EnergyReco/Train_Test/DNNTrackLengthTestCallerConfig
 #BDTMuonEnergyTrainer PythonScript configfiles/EnergyReco/Train_Test/BDTMuonTrainCallerConfig
 #BDTMuonEnergyTester PythonScript configfiles/EnergyReco/Train_Test/BDTMuonTestCallerConfig

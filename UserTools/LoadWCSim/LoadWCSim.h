@@ -71,6 +71,7 @@ class LoadWCSim: public Tool {
 	int RunType;			// Which run type was simulated?
 	std::string PMTMask;		// PMT mask for dead PMTs
 	bool splitSubtriggers;		// should subtriggers be split into different Execute steps?
+	bool loadgeom; //It is set to true by default need to be set to false to get the geometry info from LoadGeometry tool
 
 	// WCSim variables
 	//////////////////

@@ -77,35 +77,39 @@ class DNNTrackLengthPredict(Tool):
             #print( "--- loading input variables from store!")
             #Get the Energy Reco Boost Store from DataModel
             EnergyRecoBoostStore = self.m_data.Stores.at("EnergyReco")
+            EnergyRecoBoostStore.Print(False)
             ok = EnergyRecoBoostStore.Has("MaxTotalHitsToDNN")
-            print("EnergyRecoBoostStore has entry MaxTotalHitsToDNN: ",ok)
-            print("type of MaxTotalHitsToDNN entry is :",EnergyRecoBoostStore.Type("MaxTotalHitsToDNN"))
-            print("get MaxTotalHitsToDNN from EnergyRecoBoostStore")#we are going to use it to instantiate the lambda and digit times vectors
-            MaxTotalHitsToDNN=ctypes.c_int()
-            # get the contents of the Energy Reco Store
-            EnergyRecoBoostStore.Get("MaxTotalHitsToDNN",MaxTotalHitsToDNN)
-            print("MaxTotalHitsToDNN is: ", MaxTotalHitsToDNN.value)
+            if(ok):
+             print("EnergyRecoBoostStore has entry MaxTotalHitsToDNN: ",ok)
+             print("type of MaxTotalHitsToDNN entry is :",EnergyRecoBoostStore.Type("MaxTotalHitsToDNN"))
+             print("get MaxTotalHitsToDNN from EnergyRecoBoostStore")#we are going to use it to instantiate the lambda and digit times vectors
+             MaxTotalHitsToDNN=ctypes.c_int()
+             # get the contents of the Energy Reco Store
+             EnergyRecoBoostStore.Get("MaxTotalHitsToDNN",MaxTotalHitsToDNN)
+             print("MaxTotalHitsToDNN is: ", MaxTotalHitsToDNN.value)
             ok = EnergyRecoBoostStore.Has("lambda_vec")
             print("EnergyRecoBoostStore has entry lambda_vec: ",ok)
             print("type of lambda_vec entry is :",EnergyRecoBoostStore.Type("lambda_vec"))
             print("get lambda_vec from EnergyRecoBoostStore")
-            lambda_vector=std.vector[float](range(MaxTotalHitsToDNN.value))
+            lambda_vector=std.vector['double'](range(MaxTotalHitsToDNN.value))
             # get the contents of the Energy Reco Store
-            EnergyRecoBoostStore.Get("lambda_vec", lambda_vector)
+            ok=EnergyRecoBoostStore.Get("lambda_vec", lambda_vector)
+            print("Got lambda_vec from store",ok)
             print(lambda_vector.at(0))
             ok = EnergyRecoBoostStore.Has("digit_ts_vec")
             print("EnergyRecoBoostStore has entry digit_ts_vec: ",ok)
             print("type of digit_ts_vec entry is :",EnergyRecoBoostStore.Type("digit_ts_vec"))
             print("get digit_ts_vec from EnergyRecoBoostStore")
-            digit_ts_vector=std.vector[float](range(MaxTotalHitsToDNN.value))
+            digit_ts_vector=std.vector['double'](range(MaxTotalHitsToDNN.value))
             # get the contents of the Energy Reco Store
-            EnergyRecoBoostStore.Get("digit_ts_vec", digit_ts_vector)
+            ok=EnergyRecoBoostStore.Get("digit_ts_vec", digit_ts_vector)
+            print("Got digit_ts_vec from store",ok)
             print(digit_ts_vector.at(0))
             ok = EnergyRecoBoostStore.Has("lambda_max")
             print("EnergyRecoBoostStore has entry lambda_max: ",ok)
             print("type of lambda_max entry is :",EnergyRecoBoostStore.Type("lambda_max"))
             print("get lambda_max from EnergyRecoBoostStore")
-            lambda_max=ctypes.c_float()
+            lambda_max=ctypes.c_double()
             # get the contents of the Energy Reco Store
             EnergyRecoBoostStore.Get("lambda_max",lambda_max)
             print("Lambda_max is: ", lambda_max.value)
@@ -133,10 +137,25 @@ class DNNTrackLengthPredict(Tool):
 	    # get the contents of the Energy Reco Store
             EnergyRecoBoostStore.Get("TrueTrackLengthInWater",TrueTrackLengthInWater)
             print("TrueTrackLengthInWater is: ", TrueTrackLengthInWater.value)
+            if(not ok):
+                #if there is no entry in the Store the event did not pass the cuts so we don't reconstruct its track length in the water
+                return 1
             #Create features and labels and preprocess data for the model
+            features_list=[]
+            for i in range(lambda_vector.size()):
+                 features_list.append(lambda_vector.at(i))
+            for j in range(digit_ts_vector.size()):
+                 features_list.append(digit_ts_vector.at(j))
+            features_list.append(lambda_max.value)
+            features_list.append(num_pmt_hits.value)
+            features_list.append(num_lappd_hits.value)
+            #make the features and labels numpy array
+            features=numpy.array(features_list)
+            features=features.reshape(1,-1)#reshape for model
+            labels=numpy.array([TrueTrackLengthInWater.value])
         else:
-            print("opening input data file ", thistool.inputdatafilename)
-            filein = open(str(thistool.inputdatafilename))
+            print("opening input data file ", self.inputdatafilename)
+            filein = open(str(self.inputdatafilename))
             print("evts for predictions in: ", filein)
             # read into a pandas structure
             print("reading file with pandas")
@@ -154,7 +173,6 @@ class DNNTrackLengthPredict(Tool):
             #print(features[0])                                                                                                                                        
             num_events, num_pixels = features.shape
             print(num_events, num_pixels)
-        """
         # Preprocess data and load model                                                                                                                                                                               
         #-----------------------------                                                                                                                                                                                 
 
@@ -163,13 +181,15 @@ class DNNTrackLengthPredict(Tool):
         test_y = labels
         print("test sample features shape: ", test_x.shape," test sample label shape: ", test_y.shape)
 
-        # Scale data to 0 mean and unit standard deviation.                                                                                                                                                            
-        print("scaling to 0 mean and unit std-dev")
-        scaler = preprocessing.StandardScaler()
-        x_transformed = scaler.fit_transform(test_x)  # are we ok doing fit_transform on test data?                                                                                                                    
-        # scale the features                                                                                                                                                                                           
-        features_transformed = scaler.transform(features)
-
+        # Scale data to 0 mean and unit standard deviation(not when using the Store since you have a single sample).
+        if(not self.fUseStore):                                                      
+         print("scaling to 0 mean and unit std-dev")
+         scaler = preprocessing.StandardScaler()
+         x_transformed = scaler.fit_transform(test_x)  # are we ok doing fit_transform on test data?
+         # scale the features                                                                                                                                                                                           
+         features_transformed = scaler.transform(features)#NEED TO CHECK THIS WHEN RUNNING THE TRAIN_TEST TOOLCHAIN
+        else:
+         x_transformed=test_x
         # define keras model, loading weight from weights file                                                                                                                                                         
         print("defining the model")
         model = Sequential()
@@ -179,18 +199,19 @@ class DNNTrackLengthPredict(Tool):
         model.add(Dense(1, kernel_initializer='normal', activation='relu'))
 
         # load weights                                                                                                                                                                                                 
-        print("loading weights from file ", thistool.weightsfilename)
-        model.load_weights(str(thistool.weightsfilename))
+        print("loading weights from file ", self.weightsfilename)
+        model.load_weights(str(self.weightsfilename))
 
         # Compile model                                                                                                                                                                                                
         print("compiling model")
         model.compile(loss='mean_squared_error', optimizer='Adamax', metrics=['accuracy'])
-        print("Created model and loaded weights from file", thistool.weightsfilename)
+        print("Created model and loaded weights from file", self.weightsfilename)
 
         # Score accuracy / Make predictions                                                                                                                                                                            
         #----------------------------------                                                                                                                                                                            
         print('predicting...')
         y_predicted = model.predict(x_transformed)
+        print(y_predicted.shape)
 
         # estimate accuracy on dataset using loaded weights                                                                                                                                                            
         print("evalulating model on test")
@@ -201,34 +222,38 @@ class DNNTrackLengthPredict(Tool):
         print("scoring sk mse")
         score_sklearn = metrics.mean_squared_error(y_predicted, test_y)
         print('MSE (sklearn): {0:f}'.format(score_sklearn))
-
-        # Write to the output csv file                                                                                                                                                                                 
-        #------------------------------                                                                                                                                                                                
-        if (thistool.predictionsfilename is None) or ( thistool.predictionsfilename == ''):
-            # no output files today                                                                                                                                                                                    
-            print("no output file specified, not writing to file")
-            return 1
         
-        print("writing predictions to output file "+thistool.predictionsfilename)
-        # build a dataframe from the true and predicted track lengths                                                                                                                                                  
-        print("building output dataframe")
-        outputdataarray = numpy.concatenate((test_y, y_predicted),axis=1)
-        outputdataframe=pandas.DataFrame(outputdataarray, columns=['TrueTrackLengthInWater','DNNRecoLength'])
+        # Write to the output csv file or save the reconstructed track length in the Energy Reco BoostStore                                                                                                                                                                                
+        #------------------------------
+        if(self.fUseStore):
+            DNNRecoLength=float(y_predicted[0,0])
+            EnergyRecoBoostStore.Set("DNNRecoLength",DNNRecoLength)
+            print("Storing the predicted track length in the water tank by the DNN in the Energy Reco BoostStore")
+        else:
+            if (self.predictionsfilename is None) or ( self.predictionsfilename == ''):
+             # no output files today                                                                                                                                                                                    
+             print("no output file specified, not writing to file")
+             return 1
+        
+            print("writing predictions to output file "+self.predictionsfilename)
+            # build a dataframe from the true and predicted track lengths                                                                                                                                                  
+            print("building output dataframe")
+            outputdataarray = numpy.concatenate((test_y, y_predicted),axis=1)
+            outputdataframe=pandas.DataFrame(outputdataarray, columns=['TrueTrackLengthInWater','DNNRecoLength'])
 
-        # append as additional columns to the input dataframe                                                                                                                                                          
-        print("inserting True and Predicted lengths into file data")
-        testfiledata.insert(2217, 'TrueTrackLengthInWater', outputdataframe['TrueTrackLengthInWater'].values, allow_duplicates="True")
-        testfiledata.insert(2218, 'DNNRecoLength', outputdataframe['DNNRecoLength'].values, allow_duplicates="True")
+            # append as additional columns to the input dataframe                                                                                                                                                          
+            print("inserting True and Predicted lengths into file data")
+            testfiledata.insert(2217, 'TrueTrackLengthInWater', outputdataframe['TrueTrackLengthInWater'].values, allow_duplicates="True")
+            testfiledata.insert(2218, 'DNNRecoLength', outputdataframe['DNNRecoLength'].values, allow_duplicates="True")
 
-        # write to csv file                                                                                                                                                                                            
-        print("writing all data to "+thistool.predictionsfilename)
-        testfiledata.to_csv(str(thistool.predictionsfilename), float_format = '%.3f')
+            # write to csv file                                                                                                                                                                                            
+            print("writing all data to "+self.predictionsfilename)
+            testfiledata.to_csv(str(self.predictionsfilename), float_format = '%.3f')
 
-        print("clearing session")
+            print("clearing session")
         K.clear_session()
 
         print("done; returning")
-        """
         return 1
         
     def Finalise(self):

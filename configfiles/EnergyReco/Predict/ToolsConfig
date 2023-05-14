@@ -1,5 +1,5 @@
 # predict machine learning algorithm
-#myLoadGeometry LoadGeometry configfiles/LoadGeometry/LoadGeometryConfig
+myLoadGeometry LoadGeometry configfiles/LoadGeometry/LoadGeometryConfig
 myLoadWCSim LoadWCSim configfiles/EnergyReco/Predict/LoadWCSimConfig
 myLoadWCSimLAPPD LoadWCSimLAPPD configfiles/EnergyReco/Predict/LoadWCSimLAPPDConfig
 myMCParticleProperties MCParticleProperties configfiles/EnergyReco/Predict/MCParticlePropertiesConfig
