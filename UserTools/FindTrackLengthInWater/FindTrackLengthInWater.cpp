@@ -17,12 +17,13 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
   m_variables.Get("verbosity",verbosity);
   Log("FindTrackLengthInWater Tool: Initializing",v_message,verbosity);
   
+  get_ok=m_variables.Get("DoTraining", fDoTraining);//training or predict
   std::string OutputDataFile;
     get_ok = m_variables.Get("OutputDataFile",OutputDataFile);
   if(not get_ok){
     Log("FindTrackLengthInWater Tool: No OutputDataFile specified, will not be written",v_error,verbosity);
-    return false;
   }
+  if(get_ok){
   // Writing the file header(s)
   // ========================
     // writing header row
@@ -57,16 +58,14 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
            <<"recoVtxFOM,"
            <<"recoTrackLengthInMrd," //track length in the mrd reconstructed with FindMrdTracks tool
            <<"eventNum"
-           //<<"recoStatus,"
-           //<<"deltaVtxR,"
-           //<<"deltaAngle"
            <<'\n';
     csvfile.close();
     
   csvfile.open(OutputDataFile,std::fstream::app);  // open file for writing events
-  
+  }
   //Create BoostStore to store the variables for track length and energy reco
-  BoostStore* energystore = new BoostStore(true,2); // type is multi-entry binary file
+  BoostStore* energystore;
+  energystore = new BoostStore(true,2); // type is multi-entry binary file
   m_data->Stores.emplace("EnergyReco",energystore);
   
   // Get values from Config file
@@ -116,7 +115,7 @@ bool FindTrackLengthInWater::Execute(){
    }
    count2++;
    
-   // Check we successfully reconstructed a tank vertex
+   // Check for the reconstructed tank vertex
    RecoVertex* theExtendedVertex=nullptr;
    get_ok = m_data->Stores.at("RecoEvent")->Get("ExtendedVertex", theExtendedVertex);
    if((get_ok==0)||(theExtendedVertex==nullptr)){
@@ -133,47 +132,58 @@ bool FindTrackLengthInWater::Execute(){
    Log("FindTrackLengthInWater Tool: Vertex reco cuts passed",v_debug,verbosity);
    count3++;
    
-   // Check we had an MRD track FIXME for data events
-   int PrimaryMuonIndex;
-   Log("FindTrackLengthInWater Tool: Getting primary muon index",v_debug,verbosity);
-   get_ok = m_data->Stores.at("ANNIEEvent")->Get("PrimaryMuonIndex",PrimaryMuonIndex);
-   if(not get_ok){
-     Log("FindTrackLengthInWater Tool: No PrimaryMuonIndex in ANNIEEvent",v_error,verbosity);
-     return false;
-   } else if(PrimaryMuonIndex<0){
-     Log("FindTrackLengthInWater Tool: PrimaryMuonIndex is negative?",v_error,verbosity);
-     return false;
-   }
-   Log("FindTrackLengthInWater Tool: Getting MCParticles",v_debug,verbosity);
-   std::vector<MCParticle>* MCParticles=nullptr;
-   get_ok = m_data->Stores.at("ANNIEEvent")->Get("MCParticles", MCParticles);
-   if(not get_ok){
-     Log("FindTrackLengthInWater Tool: Failed to get MCParticles!",v_error,verbosity);
-     return false;
-   }
-   Log("FindTrackLengthInWater Tool: Getting primary muon",v_debug,verbosity);
-   MCParticle* primarymuon = &(MCParticles->at(PrimaryMuonIndex));
-   //double TrueTrackLengthInMrd = primarymuon->GetTrackLengthInMrd();
-   //Get mc track length in the mrd stored in the RecoEvent store from previous tools
-   double TrueTrackLengthInMrd;
-   auto get_MRDTrackLength = m_data->Stores.at("RecoEvent")->Get("TrueTrackLengthInMRD", TrueTrackLengthInMrd);
-   //normalise TrueTrackLengthInMrd
-   TrueTrackLengthInMrd= TrueTrackLengthInMrd/200.;
-   Log("FindTrackLengthInWater Tool: TrueTrackLengthInMrd="+to_string(TrueTrackLengthInMrd),v_debug,verbosity);
-   if(TrueTrackLengthInMrd<=0.){
-      Log("FindTrackLengthInWater Tool: No true MRD track, skipping",v_message,verbosity);
+     //Get the reco MRDTrackLength
+     std::vector<std::vector<int>> MrdTimeClusters;
+     std::vector<BoostStore>* theMrdTracks;
+     int numtracksinev;
+     double MRDTrackLength=-9999;
+     Position StartVertex;
+     Position StopVertex;
+     //Load the mrd time clusters from CStore
+     bool get_clusters = m_data->CStore.Get("MrdTimeClusters",MrdTimeClusters);
+      if(!get_clusters){
+        std::cout << "FindTrackLengthInWater tool: No MRD time clusters found.  Will be no tracks." << std::endl;
+        return false;
+      }
+      
+      //loop through the time clusters and get the mrd tracks
+      for(int i=0; i < (int) MrdTimeClusters.size(); i++){
+      m_data->Stores["MRDTracks"]->Get("MRDTracks",theMrdTracks);
+      m_data->Stores["MRDTracks"]->Get("NumMrdTracks",numtracksinev);
+      //loop through the mrd tracks and get the necessary info to calculate MRDTrackLength for each track
+      for(int tracki=0; tracki<numtracksinev; tracki++){
+    BoostStore* thisTrackAsBoostStore = &(theMrdTracks->at(tracki));
+    int TrackEventID = -1; 
+    //get track properties that are needed for the through-going muon selection
+	thisTrackAsBoostStore->Get("MrdSubEventID",TrackEventID);
+    if(TrackEventID!= i) continue;
+    thisTrackAsBoostStore->Get("StartVertex",StartVertex);
+    thisTrackAsBoostStore->Get("StopVertex",StopVertex);
+    MRDTrackLength = sqrt(pow((StopVertex.X()-StartVertex.X()),2)+pow(StopVertex.Y()-StartVertex.Y(),2)+pow(StopVertex.Z()-StartVertex.Z(),2)) * 100.0;
+      }
+      }
+      if(MRDTrackLength<=0.)
+      {
+      Log("FindTrackLengthInWater Tool: MRD reconstruction failed, skipping",v_message,verbosity);
       return true;
-   }
-   ++count1;  // count of number of processed events
+      }
+      count1++;
 
    // That's all the cuts!
    // ====================
+   //get info for mc vertex
+   RecoVertex *trueVtx = 0;
+   auto get_truevtx = m_data->Stores.at("RecoEvent")->Get("TrueVertex", trueVtx);
+   
+   //Get mc track length in the mrd stored in the RecoEvent store from previous tools
+   double TrueTrackLengthInMrd;
+   auto get_MRDTrackLength = m_data->Stores.at("RecoEvent")->Get("TrueTrackLengthInMRD", TrueTrackLengthInMrd);
+   Log("FindTrackLengthInWater Tool: TrueTrackLengthInMrd="+to_string(TrueTrackLengthInMrd),v_debug,verbosity);
+   
    // proceed with getting event info we need to calculate the lambda values for the track length in water reconstruction
-   double vtxX,vtxY,vtxZ,dirX,dirY,dirZ,TrueNeutrinoEnergy,trueEnergy, deltaVtxR, deltaAngle;
+   double vtxX,vtxY,vtxZ,dirX,dirY,dirZ,TrueNeutrinoEnergy,trueEnergy;
    std::vector<double> digitX; std::vector<double> digitY;  std::vector<double> digitZ;
    std::vector<double> digitT;
-   std::map<unsigned long,std::vector<MCHit>>* MCHits=nullptr;
-   std::map<unsigned long,std::vector<MCLAPPDHit>>* MCLAPPDHits=nullptr;
    
    // get reconstructed vertex and direction info
    Log("FindTrackLengthInWater Tool: Getting recovertex and dir",v_debug,verbosity);
@@ -188,18 +198,9 @@ bool FindTrackLengthInWater::Execute(){
    Log("FindTrackLengthInWater Tool: Getting primary muon info",v_debug,verbosity);
    double TrueTrackLengthInWater;
    auto get_tankTrackLength = m_data->Stores.at("RecoEvent")->Get("TrueTrackLengthInWater", TrueTrackLengthInWater); 
-   //double TrueTrackLengthInWater = primarymuon->GetTrackLengthInTank();
    auto get_muonMCEnergy = m_data->Stores.at("RecoEvent")->Get("TrueMuonEnergy", trueEnergy);
-   //trueEnergy = 1.*primarymuon->GetStartEnergy();  // [MeV]
-   deltaVtxR = 100.*(theExtendedVertex->GetPosition()-primarymuon->GetStartVertex()).Mag();
-   /*double cosphi = primarymuon->GetStartDirection().X()*dirX+
-                   primarymuon->GetStartDirection().Y()*dirY+
-                   primarymuon->GetStartDirection().Z()*dirZ;
-   double phi = TMath::ACos(cosphi); // radians
-   //deltaAngle = phi*TMath::RadToDeg();
-   //deltaAngle = (theExtendedVertex->GetDirection()-primarymuon->GetStartDirection()).Mag();
-
-   // Get neutrino info needed for neutrino energy BDT training
+   
+   /*// Get neutrino info needed for neutrino energy BDT training
    get_ok = m_data->Stores.at("GenieEvent")->Get("TrueNeutrinoEnergy", TrueNeutrinoEnergy);
    if(not get_ok){
    	Log("FindTrackLengthInWater Tool: Failed to retrieve TrueNeutrinoEnergy!",v_error,verbosity);
@@ -207,118 +208,23 @@ bool FindTrackLengthInWater::Execute(){
    }
    */
    
-   // get hits from the ANNIEEvent store
-   Log("FindTrackLengthInWater Tool: Getting pmt hits",v_debug,verbosity);
-   get_ok = m_data->Stores.at("ANNIEEvent")->Get("MCHits", MCHits);
-   if(not get_ok){
-      Log("FindTrackLengthInWater Tool: Failed to retrieve the MCHits!",v_error,verbosity);
-      return false;
-   }
    // get digits from RecoDigit store
    std::vector<RecoDigit>* digitList;
    m_data->Stores.at("RecoEvent")->Get("RecoDigit", digitList);
-   // Extract the PMT & LAPPD hit information
+   // Extract the PMT & LAPPD digit information
    // ===============================
    int totalPMTs =0; // number of digits from PMT hits in the event
-   /*Position detector_center=anniegeom->GetTankCentre();
-   double tank_center_x = detector_center.X();
-   double tank_center_y = detector_center.Y();
-   double tank_center_z = detector_center.Z();
-   int totalPMTs =0; // number of PMT hits in the event
-   
-   std::map<unsigned long,std::vector<MCHit>>::iterator it_tank_mc;
-   it_tank_mc = (*MCHits).begin();
-   bool loop_tank = true;
-   int hits_size = MCHits->size();
-   if (hits_size == 0) loop_tank = false;
-   
-   while (loop_tank){
-    unsigned long channel_key;
-    channel_key = it_tank_mc->first;
-    Detector* this_detector = anniegeom->ChannelToDetector(channel_key);
-    Position det_position = this_detector->GetDetectorPosition();
-
-        std::vector<MCHit> ThisPMTHits = it_tank_mc->second;
-        totalPMTs+=ThisPMTHits.size();
-        for (MCHit &ahit : ThisPMTHits){
-          digitX.push_back((det_position.X()-tank_center_x));
-          digitY.push_back((det_position.Y()-tank_center_y));
-          digitZ.push_back((det_position.Z()-tank_center_z));
-          digitT.push_back(ahit.GetTime());
-        }
-      it_tank_mc++;
-      if (it_tank_mc == (*MCHits).end()) loop_tank = false;
-     }*/
-     //
-     
   int totalLAPPDs = 0; // number of digits from LAPPD hits in the event
   for(RecoDigit &adigit : *digitList){
 	  digitX.push_back(adigit.GetPosition().X());
 	  digitY.push_back(adigit.GetPosition().Y());
 	  digitZ.push_back(adigit.GetPosition().Z());
 	  digitT.push_back(adigit.GetCalTime());
-	  if(adigit.GetDigitType()==0){totalPMTs+=1;} //when the digit type is zero we have a PMT hit
+	  if(adigit.GetDigitType()==0){totalPMTs+=1;} //when the digit type is zero we have a PMT digit
 	  else{totalLAPPDs+=1;}// when it is 1 we have LAPPD
   }
-   
-   //Log("FindTrackLengthInWater Tool: Getting lappd hits",v_debug,verbosity);
-   //get_ok = m_data->Stores.at("ANNIEEvent")->Get("MCLAPPDHits", MCLAPPDHits);
-   
-   //FIXME REMOVE FURTHER COMMENTS BELOW for LAPPD work FIXME 
-   
-   //if(not get_ok){
-   //   Log("FindTrackLengthInWater Tool: Failed to retrieve the MCLAPPDHits!",v_error,verbosity);
-   //   return false;
-   //}
-   
-   // Extract the PMT hit information
-   // ===============================
-/*   
-   Log("FindTrackLengthInWater Tool: Getting pmt hits",v_debug,verbosity);
-   digitX.clear(); digitY.clear(); digitZ.clear(); digitT.clear();
-   int totalPMTs =0; // number of PMT hits in the event
-	Log("TotalLightMap Tool: Looping over PMTs with a hit",v_debug,verbosity);
-	for(std::pair<const unsigned long,std::vector<MCHit>>& nextpmt : *MCHits ){
-		// if it's not a tank PMT, ignore it
-		Detector* thepmt = anniegeom->ChannelToDetector(nextpmt.first);
-		if(thepmt->GetDetectorElement()!="Tank") continue;
-		if(thepmt->GetTankLocation()=="OD") continue;  // don't utilize OD pmts?
-		totalPMTs += nextpmt.second.size();
-		Position PMT_position = thepmt->GetPositionInTank();
-		// loop over hits on this PMT
-		// ==========================
-		for(MCHit& nexthit : nextpmt.second){
-			double hit_time = nexthit.GetTime();
-			digitT.push_back(hit_time);
-			digitX.push_back(PMT_position.X()-tank_center_x);
-			digitY.push_back(PMT_position.Y()-tank_center_y);
-			digitZ.push_back(PMT_position.Z()-tank_center_z);
-		}
-	}*/
    Log("FindTrackLengthInWater Tool: Got "+to_string(totalPMTs)+" PMT digits; "+to_string(digitT.size())
        +" total digits so far",v_debug,verbosity);
-   std::cout<<"this is totalPMTs"<<totalPMTs<<std::endl;
-   // Extract the LAPPD hit information
-   // =================================
-   
-   //FIXME for LAPPD work remove the bellow comments
-	//Log("TotalLightMap Tool: Looping over LAPPDs with a hit",v_debug,verbosity);
-	//for(std::pair<const unsigned long,std::vector<MCLAPPDHit>>& nextlappd : *MCLAPPDHits ){
-	//	// don't actually need to get the LAPPD itself; all info we need is in the hit
-	//	totalLAPPDs += nextlappd.second.size();
-		// loop over hits on this LAPPD
-		// ============================
-	//	for(MCLAPPDHit& nexthit : nextlappd.second){
-	//		double hit_time = nexthit.GetTime();
-	//		digitT.push_back(hit_time);
-	//		std::vector<double> hitpos = nexthit.GetPosition(); // in global coords
-	//		Position LAPPDhitpos = Position(hitpos.at(0), hitpos.at(1), hitpos.at(2));
-	//		LAPPDhitpos -= anniegeom->GetTankCentre();
-	//		digitX.push_back(LAPPDhitpos.X());
-	//		digitY.push_back(LAPPDhitpos.Y());
-	//		digitZ.push_back(LAPPDhitpos.Z());
-	//	}
-	//}
    Log("FindTrackLengthInWater Tool: Got "+to_string(totalLAPPDs)+" LAPPD digits; "+to_string(digitT.size())
         +" total digits",v_debug,verbosity);
    
@@ -326,24 +232,22 @@ bool FindTrackLengthInWater::Execute(){
    // =====================================
         //calculate diff dir with (0,0,1)
         double diffDirAbs0 = TMath::ACos(dirZ)*TMath::RadToDeg();
-        //cout<<"diffDirAbs0: "<<diffDirAbs0<<endl;
         float diffDirAbs2=diffDirAbs0/90.;
-        double recoVtxR2 = vtxX*vtxX + vtxZ*vtxZ;//vtxY*vtxY;
+        double recoVtxR2 = vtxX*vtxX + vtxZ*vtxZ;
         double recoDWallR = tank_radius-TMath::Sqrt(recoVtxR2);
         double recoDWallZ = tank_halfheight/2.-TMath::Abs(vtxY);
 	//Get true vtx and dir (optional)
-	double truevtxX=primarymuon->GetStartVertex().X();
-	double truevtxY=primarymuon->GetStartVertex().Y();
-	double truevtxZ=primarymuon->GetStartVertex().Z();
-        double truedirX=primarymuon->GetStartDirection().X();
-	double truedirY=primarymuon->GetStartDirection().Y();
-	double truedirZ=primarymuon->GetStartDirection().Z();
-	//double DR=TMath::Sqrt((vtxX-truevtxX)*(vtxX-truevtxX)+(vtxY-truevtxY)*(vtxY-truevtxY)+(vtxZ-truevtxZ)*(vtxZ-truevtxZ));//Calculates difference between reco and true vtx for good events
+	double truevtxX=trueVtx->GetPosition().X();
+	double truevtxY=trueVtx->GetPosition().Y();
+	double truevtxZ=trueVtx->GetPosition().Z();
+        double truedirX=trueVtx->GetDirection().X();
+	double truedirY=trueVtx->GetDirection().Y();
+	double truedirZ=trueVtx->GetDirection().Z();
 	// Estimate the track length
 	// =========================
         Log("FindTrackLengthInWater Tool: Estimating track length in tank",v_debug,verbosity);
 	double lambda_min = 10000000;  double lambda_max = -99999999.9; double lambda = 0;
-	std::vector<double> lambda_vector; // booststore works better with vectors
+	std::vector<double> lambda_vector;
 	for(int k=0; k<digitT.size(); k++){
 
 	  // Estimate length as the distance between the reconstructed vertex and last photon emission point
@@ -355,59 +259,19 @@ bool FindTrackLengthInWater::Execute(){
 	      lambda_max = lambda;
 	  }
           lambda_vector.push_back(lambda);
-         //m_data->Stores["ANNIEEvent"]->Set("WaterRecoTrackLength",lambda_max);
   	}
-        ///Log("FindTrackLengthInWater Tool: lambda_max (estimated track length) is: "+to_string(lambda_max),v_debug,verosity);
-       
+  	
        // Post-processing of variables to store
        // =====================================
        float recoDWallR2      = recoDWallR/tank_radius;
        float recoDWallZ2      = recoDWallZ/tank_halfheight*2.;
        float TrueTrackLengthInWater2 = TrueTrackLengthInWater*100.;  // convert to [cm]
        float TrueTrackLengthInMrd2 = TrueTrackLengthInMrd*100.;      // convert to [cm]
-       // we need to normalise the digit time and lambda vectors to fixed dimensions to match the DNN
+       // we need to normalise the digit time and lambda vectors to fixed dimensions to match the MaxTotalHitsToDNN
        
        lambda_vector.resize(maxhits0);
        
        digitT.resize(maxhits0);
-       
-       //Get the reco MRDTrackLength
-std::vector<std::vector<int>> MrdTimeClusters;
-std::vector<BoostStore>* theMrdTracks;
-int numtracksinev;
-double MRDTrackLength;
-Position StartVertex;
-Position StopVertex;
-//Load the mrd time clusters from CStore
-bool get_clusters = m_data->CStore.Get("MrdTimeClusters",MrdTimeClusters);
-      if(!get_clusters){
-        std::cout << "FindTrackLengthInWater tool: No MRD time clusters found.  Will be no tracks." << std::endl;
-        return false;
-      }
-      //if there are 0 time clusters set default value for MRDTrackLength
-      if(MrdTimeClusters.size()<1){
-      MRDTrackLength = -9999;
-      }
-      //loop through the time clusters and get the mrd tracks
-      for(int i=0; i < (int) MrdTimeClusters.size(); i++){
-      m_data->Stores["MRDTracks"]->Get("MRDTracks",theMrdTracks);
-      m_data->Stores["MRDTracks"]->Get("NumMrdTracks",numtracksinev);
-      //if there are 0 mrd tracks in the time cluster set default value for MRDTrackLength
-      if(numtracksinev<1){
-      MRDTrackLength = -9999;
-      }
-      //loop through the mrd tracks and get the necessary info to calculate MRDTrackLength for each track
-      for(int tracki=0; tracki<numtracksinev; tracki++){
-    BoostStore* thisTrackAsBoostStore = &(theMrdTracks->at(tracki));
-    int TrackEventID = -1; 
-    //get track properties that are needed for the through-going muon selection
-	thisTrackAsBoostStore->Get("MrdSubEventID",TrackEventID);
-    if(TrackEventID!= i) continue;
-    thisTrackAsBoostStore->Get("StartVertex",StartVertex);
-    thisTrackAsBoostStore->Get("StopVertex",StopVertex);
-    MRDTrackLength = sqrt(pow((StopVertex.X()-StartVertex.X()),2)+pow(StopVertex.Y()-StartVertex.Y(),2)+pow(StopVertex.Z()-StartVertex.Z(),2)) * 100.0;
-      }
-      }
        
        m_data->Stores.at("EnergyReco")->Delete();//clear the last entry from RAM
        
@@ -434,7 +298,7 @@ bool get_clusters = m_data->CStore.Get("MrdTimeClusters",MrdTimeClusters);
         m_data->Stores.at("EnergyReco")->Set("num_pmt_hits",totalPMTs);
         m_data->Stores.at("EnergyReco")->Set("num_lappd_hits",totalLAPPDs);
         m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInWater",TrueTrackLengthInWater2);
-        m_data->Stores.at("EnergyReco")->Set("trueNeuE",TrueNeutrinoEnergy);
+        //m_data->Stores.at("EnergyReco")->Set("trueNeuE",TrueNeutrinoEnergy);
         m_data->Stores.at("EnergyReco")->Set("trueE",trueEnergy);
         m_data->Stores.at("EnergyReco")->Set("diffDirAbs2",diffDirAbs2);
         m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInMrd2",TrueTrackLengthInMrd2);
@@ -443,13 +307,8 @@ bool get_clusters = m_data->CStore.Get("MrdTimeClusters",MrdTimeClusters);
         m_data->Stores.at("EnergyReco")->Set("dirVec",theExtendedVertex->GetDirection());
         m_data->Stores.at("EnergyReco")->Set("vtxVec",theExtendedVertex->GetPosition());
         m_data->Stores.at("EnergyReco")->Set("recoVtxFOM",recoVtxFOM);
-        m_data->Stores.at("EnergyReco")->Set("recoStatus",recoStatus);
-        m_data->Stores.at("EnergyReco")->Set("deltaVtxR",deltaVtxR);
         m_data->Stores.at("EnergyReco")->Set("recoTrackLengthInMrd",MRDTrackLength);
-        //m_data->Stores.at("EnergyReco")->Set("deltaAngle",deltaAngle);
 
-int fDoTraining=0;
-  get_ok=m_variables.Get("DoTraining", fDoTraining);
   if(not get_ok){
     Log("FindTrackLengthInWater Tool: Not doing training, so BoostStore will not be saved locally",v_error,verbosity);
     }
@@ -499,11 +358,7 @@ if (fDoTraining){
          <<recoVtxFOM<<","
          <<MRDTrackLength<<","
          <<EventNumber
-         //<<recoStatus<<","
-         //<<deltaVtxR<<","
-         //<<deltaAngle
          <<'\n';
-  //++entries_written;
 
   return true;
 }
@@ -568,7 +423,7 @@ bool FindTrackLengthInWater::Finalise(){
   std::cout<<"processed a total of "<<count4<<" events, of which "
            <<count2<<" passed event selection cuts, "<<count3
            <<" had a reconstructed vertex and "<<count1
-           <<" also had a non-zero MRD track length"<<std::endl;
+           <<" also had a positive reconstructed MRD track length"<<std::endl;
   std::cout<<"FindTrackLengthInWater Tool: processed "<<count1<<" events"<<std::endl;
 
   return true;

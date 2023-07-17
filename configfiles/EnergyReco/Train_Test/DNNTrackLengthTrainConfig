@@ -10,7 +10,7 @@ ExecuteFunction Finalise
 FinaliseFunction Execute
 
 # DNN model, weights etc
-TrackLengthOutputWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets_false.hdf5
+TrackLengthOutputWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets_New.hdf5
 
 # Training data
 TrackLengthTrainingInputDataFile Data_Energy_Reco/data_for_trackLength_training.csv

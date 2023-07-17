@@ -3,20 +3,7 @@
 
 PythonScript BDTMuonEnergyPredict
 
-InitialiseFunction Initialise
-ExecuteFunction Finalise
-FinaliseFunction Execute
-
 verbose 1
 
 # BDT model file to load
-BDTMuonModelFile UserTools/EnergyReco/stand_alone/weights/finalized_BDTmodel_forMuonEnergyWithRecoMRD.sav
-
-# for generating a legacy-style csv output
-MuonEnergyPredictionsFile Data_Energy_Reco/BDT_MuE_predict_output.csv     # Use 'NA' to skip
-
-# deprecated: only train with neutrinos below this threshold
-BDT_NuE_threshold 2.0  # [GeV]
-
-#Input File for Muon Energy predictions
-MuonEnergyInputDataFile Data_Energy_Reco/DNN_predict_output.csv
+BDTMuonModelFile finalized_BDTmodel_forMuonEnergy_New.sav

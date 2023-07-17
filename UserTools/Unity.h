@@ -170,3 +170,4 @@
 #include "PythonScript.h"
 #include "MeanTimeCheck.h"
 #include "VtxSeedFineGrid.h"
+#include "PlotsTrackLengthAndEnergy.h"

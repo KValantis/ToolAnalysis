@@ -293,6 +293,10 @@ class PhaseIITreeMaker: public Tool {
   double fRecoPhi;
   int fRecoStatus;
   
+  //Reco Length and Energy
+  double fDNNRecoLength;
+  double fBDTMuonEnergy;
+  
   // ************* Difference between MC and Truth *********** //
   double fDeltaVtxX; 
   double fDeltaVtxY;

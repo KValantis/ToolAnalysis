@@ -259,6 +259,8 @@ bool PhaseIITreeMaker::Initialise(std::string configfile, DataModel &data){
       fPhaseIITrigTree->Branch("recoPhi",&fRecoPhi,"recoPhi/D");
       fPhaseIITrigTree->Branch("recoVtxFOM",&fRecoVtxFOM,"recoVtxFOM/D");
       fPhaseIITrigTree->Branch("recoStatus",&fRecoStatus,"recoStatus/I");
+      fPhaseIITrigTree->Branch("DNNRecoLength",&fDNNRecoLength,"DNNRecoLength/D");
+      fPhaseIITrigTree->Branch("BDTMuonEnergy",&fBDTMuonEnergy,"BDTMuonEnergy/D");
     }
   
     //MC truth information for muons
@@ -937,6 +939,8 @@ void PhaseIITreeMaker::ResetVariables() {
     fRecoDirZ = -9999;
     fRecoAngle = -9999;
     fRecoPhi = -9999;
+    fDNNRecoLength = -9999;
+    fBDTMuonEnergy = -9999;
   }
 
   if(MRDClusterProcessing){
@@ -1444,6 +1448,24 @@ bool PhaseIITreeMaker::FillTankRecoInfo() {
       else fRecoPhi = 0;
     }
     fRecoStatus = recovtx->GetStatus();
+  }
+  //Get reco length and energy
+  double DNNRecoLength, BDTMuonEnergy;
+  auto get_recolength = m_data->Stores.at("RecoEvent")->Get("DNNRecoLength",DNNRecoLength);
+  if(!get_recolength) {
+    Log("Warning: The PhaseIITreeMaker tool could not find DNNRecoLength. Continuing to build tree", v_message, verbosity);
+    got_reco_info = false;
+  }
+  else{
+  fDNNRecoLength=DNNRecoLength;
+  }
+  auto get_recoenergy = m_data->Stores.at("RecoEvent")->Get("BDTMuonEnergy",BDTMuonEnergy);
+  if(!get_recoenergy) {
+    Log("Warning: The PhaseIITreeMaker tool could not find BDTMuonEnergy. Continuing to build tree", v_message, verbosity);
+    got_reco_info = false;
+  }
+  else{
+  fBDTMuonEnergy=BDTMuonEnergy;
   }
   return got_reco_info;
 }

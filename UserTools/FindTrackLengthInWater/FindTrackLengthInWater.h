@@ -32,6 +32,7 @@ class FindTrackLengthInWater: public Tool {
   Geometry* anniegeom=nullptr;
   double tank_radius;
   double tank_halfheight;
+  int fDoTraining=0;
   
 	// verbosity levels: if 'verbosity' < this level, the message type will be logged.
 	int verbosity=1;

@@ -162,5 +162,6 @@ if (tool=="LAPPDDataDecoder") ret=new LAPPDDataDecoder;
 if (tool=="PythonScript") ret=new PythonScript;
 if (tool=="MeanTimeCheck") ret=new MeanTimeCheck;
 if (tool=="VtxSeedFineGrid") ret=new VtxSeedFineGrid;
+if (tool=="PlotsTrackLengthAndEnergy") ret=new PlotsTrackLengthAndEnergy;
 return ret;
 }

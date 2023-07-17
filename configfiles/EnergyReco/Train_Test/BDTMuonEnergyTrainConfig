@@ -1,11 +1,15 @@
 # This config file stores variables that may be retrieved by the python script
 # Access them by retrieving the corresponding variable from the 'Config' store
 
+PythonScript BDTMuonEnergyTrain_Test
+
+verbosity 1
+
+InitialiseFunction Initialise
+ExecuteFunction Finalise
+FinaliseFunction Execute
+
 # BDT model file to write
-BDTMuonModelFile finalized_BDTmodel_forMuonEnergy.sav
+BDTMuonEnergyWeightsFile finalized_BDTmodel_forMuonEnergy_New.sav
 
-# training data
-MuonEnergyTrainingDataFile /ToolAnalysisLink/Data_Energy_Reco/BDT_training_input.csv
-
-# deprecated: only train with muons below this threshold
-BDT_NuE_threshold 2.0  # [GeV]
+BDTMuonEnergyTrainingInputBoostStoreFile EnergyReco.bs
