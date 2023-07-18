@@ -203,9 +203,7 @@ class DNNTrackLengthPredict(Tool):
 
         #Set the DNNRecoLength in the EnergyReco boost store for next tools
         DNNRecoLength=ctypes.c_double(y_predicted[0])
-        RecoEventStore = cppyy.gbl.BoostStore(True, 0)
-        RecoEventStore = self.m_data.Stores.at("RecoEvent")
-        RecoEventStore.Set("DNNRecoLength", DNNRecoLength)
+        EnergyRecoBoostStore.Set("DNNRecoLength", DNNRecoLength)
         return 1
         
     def Finalise(self):

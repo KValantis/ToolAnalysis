@@ -100,6 +100,7 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
 bool FindTrackLengthInWater::Execute(){
    Log("FindTrackLengthInWater Tool: Executing",v_message,verbosity);
    count4++;
+   m_data->Stores.at("EnergyReco")->Delete();//clear the last entry from RAM
 
    // See if this event passes selection: we have several potential cuts.
    // First check the EventCutstatus: event was in fiducial volume, had a stopping muon etc.
@@ -272,8 +273,6 @@ bool FindTrackLengthInWater::Execute(){
        lambda_vector.resize(maxhits0);
        
        digitT.resize(maxhits0);
-       
-       m_data->Stores.at("EnergyReco")->Delete();//clear the last entry from RAM
        
        // put max nhits into store for use in the next tool
        m_data->Stores.at("EnergyReco")->Set("MaxTotalHitsToDNN",maxhits0);

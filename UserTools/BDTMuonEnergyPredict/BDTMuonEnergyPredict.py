@@ -67,15 +67,13 @@ class BDTMuonEnergyPredict(Tool):
             print("Getting num_lappd_hits from EnergyRecoBoostStore")
             EnergyRecoBoostStore.Get("num_lappd_hits",num_lappd_hits)
         print("Number of lappd hits is: ", num_lappd_hits.value)
-        RecoEventStore = cppyy.gbl.BoostStore(True, 0)
-        RecoEventStore = self.m_data.Stores.at("RecoEvent")
-        ok = RecoEventStore.Has("DNNRecoLength")
+        ok = EnergyRecoBoostStore.Has("DNNRecoLength")
         DNNRecoLength=ctypes.c_double(0)
         if ok:
-            print("RecoEventStore has entry DNNRecoLength: ",ok)
-            print("type of DNNRecoLength entry is :",RecoEventStore.Type("DNNRecoLength"))
-            print("Getting DNNRecoLength from RecoEventStore")
-            RecoEventStore.Get("DNNRecoLength",DNNRecoLength)
+            print("EnergyRecoBoostStore has entry DNNRecoLength: ",ok)
+            print("type of DNNRecoLength entry is :",EnergyRecoBoostStore.Type("DNNRecoLength"))
+            print("Getting DNNRecoLength from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("DNNRecoLength",DNNRecoLength)
         print("The reconstructed track length in the water by the DNN is: ", DNNRecoLength.value)
         ok = EnergyRecoBoostStore.Has("recoTrackLengthInMrd")
         recoTrackLengthInMrd=ctypes.c_double(0)
@@ -157,7 +155,7 @@ class BDTMuonEnergyPredict(Tool):
 
         #Set the BDTMuonEnergy in the EnergyReco boost store to be loaded by other tools
         BDTMuonEnergy=ctypes.c_double(recoEnergy[0])
-        RecoEventStore.Set("BDTMuonEnergy", BDTMuonEnergy)
+        EnergyRecoBoostStore.Set("BDTMuonEnergy", BDTMuonEnergy)
 
         ok = EnergyRecoBoostStore.Has("TrueTrackLengthInWater")
         TrueTrackLengthInWater=ctypes.c_float(0)
