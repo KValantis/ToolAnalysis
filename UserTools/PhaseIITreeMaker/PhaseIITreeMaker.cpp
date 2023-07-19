@@ -1451,18 +1451,16 @@ bool PhaseIITreeMaker::FillTankRecoInfo() {
   }
   //Get reco length and energy
   double DNNRecoLength, BDTMuonEnergy;
-  auto get_recolength = m_data->Stores.at("RecoEvent")->Get("DNNRecoLength",DNNRecoLength);
+  auto get_recolength = m_data->Stores.at("EnergyReco")->Get("DNNRecoLength",DNNRecoLength);
   if(!get_recolength) {
     Log("Warning: The PhaseIITreeMaker tool could not find DNNRecoLength. Continuing to build tree", v_message, verbosity);
-    got_reco_info = false;
   }
   else{
   fDNNRecoLength=DNNRecoLength;
   }
-  auto get_recoenergy = m_data->Stores.at("RecoEvent")->Get("BDTMuonEnergy",BDTMuonEnergy);
+  auto get_recoenergy = m_data->Stores.at("EnergyReco")->Get("BDTMuonEnergy",BDTMuonEnergy);
   if(!get_recoenergy) {
     Log("Warning: The PhaseIITreeMaker tool could not find BDTMuonEnergy. Continuing to build tree", v_message, verbosity);
-    got_reco_info = false;
   }
   else{
   fBDTMuonEnergy=BDTMuonEnergy;
