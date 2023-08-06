@@ -27,11 +27,12 @@ class FindTrackLengthInWater: public Tool {
   int maxhits0=1100;
   bool first=1; bool deny_access=0;
   // counters to keep track of cut efficiencies
-  int count1=0, count2=0, count3=0, count4=0, count5=0;
+  int count1=0, count2=0, count3=0, count4=0;
   std::ofstream csvfile;
   Geometry* anniegeom=nullptr;
   double tank_radius;
   double tank_halfheight;
+  int fDoTraining=0;
   
 	// verbosity levels: if 'verbosity' < this level, the message type will be logged.
 	int verbosity=1;

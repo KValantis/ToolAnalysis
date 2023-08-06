@@ -3,3 +3,4 @@
 verbosity 1
 MaxTotalHitsToDNN 1100
 OutputDataFile Data_Energy_Reco/data_for_trackLength_training.csv
+DoTraining 1

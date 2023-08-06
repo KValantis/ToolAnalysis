@@ -227,7 +227,7 @@ bool LoadWCSim::Initialise(std::string configfile, DataModel &data){
 	
 	// Convert WCSimRootGeom into ToolChain Geometry class
 	Geometry* anniegeom = ConstructToolChainGeometry();
-	
+
 	// Set run-level information in the ANNIEEvent
 	// ===========================================
 	/*
@@ -1015,7 +1015,7 @@ Geometry* LoadWCSim::ConstructToolChainGeometry(){
 		cout<<"constructed anniegeom at "<<anniegeom<<" with tank origin "; tank_centre.Print();
 	}
 	m_data->Stores.at("ANNIEEvent")->Header->Set("AnnieGeometry",anniegeom,true);
-	
+
 	// Construct the Detectors and Channels
 	// ====================================
 	// PMTs

@@ -21,26 +21,137 @@ from sklearn.utils import shuffle
 from sklearn import linear_model, ensemble
 from sklearn.metrics import mean_squared_error
 import pickle
+import ROOT
 
 class BDTMuonEnergyPredict(Tool):
     
     # declare member variables here
-    E_threshold=ctypes.c_double()
-    inputdatafilename=std.string("")
-    predictionsdatafilename=std.string("")
-    modelfilename=std.string("")
+    weightsfilename = std.string("")
     
     def Initialise(self):
         self.m_log.Log(__file__+" Initialising", self.v_debug, self.m_verbosity)
         self.m_variables.Print()
-        self.m_variables.Get("BDT_NuE_threshold", self.E_threshold)
-        self.m_variables.Get("MuonEnergyInputDataFile", self.inputdatafilename)
-        self.m_variables.Get("MuonEnergyPredictionsFile", self.predictionsdatafilename)
-        self.m_variables.Get("BDTMuonModelFile", self.modelfilename)
+        self.m_variables.Get("BDTMuonModelFile", self.weightsfilename)
         return 1
     
     def Execute(self):
         self.m_log.Log(__file__+" Executing", self.v_debug, self.m_verbosity)
+        #Load Data
+        EnergyRecoBoostStore=cppyy.gbl.BoostStore(True, 2)#define the energy boost store class object to load the variables for the BDT training
+        EnergyRecoBoostStore = self.m_data.Stores.at("EnergyReco")
+        #Retrieve the required variables from the Store
+        EnergyRecoBoostStore.Print(False)
+        get_ok = EnergyRecoBoostStore.Has("num_pmt_hits")
+        num_pmt_hits=ctypes.c_int(0)
+        if not get_ok:
+            print("BDTMuonEnergyPredict Tool: There is no entry in Energy Reco boost store.")
+            return 1
+        if get_ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry num_pmt_hits: ", get_ok)
+            print("BDTMuonEnergyPredict Tool: type of num_pmt_hits entry is :",EnergyRecoBoostStore.Type("num_pmt_hits"))
+            print("BDTMuonEnergyPredict Tool: Getting num_pmt_hits from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("num_pmt_hits",num_pmt_hits)
+        print("BDTMuonEnergyPredict Tool: Number of pmt hits is: ", num_pmt_hits.value)
+        ok = EnergyRecoBoostStore.Has("num_lappd_hits")
+        num_lappd_hits=ctypes.c_int(0)
+        if ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry num_lappd_hits: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of num_lappd_hits entry is :",EnergyRecoBoostStore.Type("num_lappd_hits"))
+            print("BDTMuonEnergyPredict Tool: Getting num_lappd_hits from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("num_lappd_hits",num_lappd_hits)
+        print("BDTMuonEnergyPredict Tool: Number of lappd hits is: ", num_lappd_hits.value)
+        ok = EnergyRecoBoostStore.Has("DNNRecoLength")
+        DNNRecoLength=ctypes.c_double(0)
+        if ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry DNNRecoLength: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of DNNRecoLength entry is :",EnergyRecoBoostStore.Type("DNNRecoLength"))
+            print("BDTMuonEnergyPredict Tool: Getting DNNRecoLength from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("DNNRecoLength",DNNRecoLength)
+        print("BDTMuonEnergyPredict Tool: The reconstructed track length in the water by the DNN is: ", DNNRecoLength.value)
+        ok = EnergyRecoBoostStore.Has("recoTrackLengthInMrd")
+        recoTrackLengthInMrd=ctypes.c_double(0)
+        if ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry recoTrackLengthInMrd: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of recoTrackLengthInMrd entry is :",EnergyRecoBoostStore.Type("recoTrackLengthInMrd"))
+            print("BDTMuonEnergyPredict Tool: Getting recoTrackLengthInMrd from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("recoTrackLengthInMrd",recoTrackLengthInMrd)
+        print("BDTMuonEnergyPredict Tool: The reconstructed track length in the MRD is: ", recoTrackLengthInMrd.value)
+        ok = EnergyRecoBoostStore.Has("diffDirAbs")
+        diffDirAbs=ctypes.c_float(0)
+        if ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry diffDirAbs: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of diffDirAbs entry is :",EnergyRecoBoostStore.Type("diffDirAbs"))
+            print("BDTMuonEnergyPredict Tool: Getting diffDirAbs from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("diffDirAbs",diffDirAbs)
+        print("BDTMuonEnergyPredict Tool: DiffDirAbs is: ", diffDirAbs.value)
+        ok = EnergyRecoBoostStore.Has("recoDWallR")
+        recoDWallR=ctypes.c_float(0)
+        if ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry recoDWallR: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of recoDWallR entry is :",EnergyRecoBoostStore.Type("recoDWallR"))
+            print("BDTMuonEnergyPredict Tool: Getting recoDWallR from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("recoDWallR",recoDWallR)
+        print("BDTMuonEnergyPredict Tool: RecoDWallR is: ", recoDWallR.value)
+        ok = EnergyRecoBoostStore.Has("recoDWallZ")
+        recoDWallZ=ctypes.c_float(0)
+        if(ok):
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry recoDWallZ: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of recoDWallZ entry is :",EnergyRecoBoostStore.Type("recoDWallZ"))
+            print("BDTMuonEnergyPredict Tool: Getting recoDWallZ from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("recoDWallZ",recoDWallZ)
+        print("BDTMuonEnergyPredict Tool: RecoDWallZ is: ", recoDWallZ.value)
+        ok = EnergyRecoBoostStore.Has("vtxVec")
+        vtx_position=cppyy.gbl.Position()
+        if ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry vtxVec: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of vtxVec entry is :", EnergyRecoBoostStore.Type("vtxVec"))
+            print("BDTMuonEnergyPredict Tool: Getting vtxVec from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("vtxVec", vtx_position)
+        vtxX=vtx_position.X()
+        print("BDTMuonEnergyPredict Tool: VtxX is: ", vtxX)
+        vtxY=vtx_position.Y()
+        print("BDTMuonEnergyPredict Tool: VtxY is: ", vtxY)
+        vtxZ=vtx_position.Z()
+        print("BDTMuonEnergyPredict Tool: VtxZ is: ", vtxZ)
+        ok = EnergyRecoBoostStore.Has("trueE")
+        trueE=ctypes.c_double(0)
+        if ok:
+            print("BDTMuonEnergyPredict Tool: EnergyRecoBoostStore has entry trueE: ",ok)
+            print("BDTMuonEnergyPredict Tool: type of trueE entry is :",EnergyRecoBoostStore.Type("trueE"))
+            print("BDTMuonEnergyPredict Tool: Getting trueE from EnergyRecoBoostStore")
+            EnergyRecoBoostStore.Get("trueE",trueE)
+        print("BDTMuonEnergyPredict Tool: The MC muon energy is: ", trueE.value)
+
+        #Create features and labels and preprocess data for the model
+        features_list=[]
+        features_list.append(DNNRecoLength.value/600.)
+        features_list.append(recoTrackLengthInMrd.value/200.)
+        features_list.append(diffDirAbs.value)
+        features_list.append(recoDWallR.value)
+        features_list.append(recoDWallZ.value)
+        features_list.append(num_lappd_hits.value/200.)
+        features_list.append(num_pmt_hits.value/200.)
+        features_list.append(vtxX/150.)
+        features_list.append(vtxY/200.)
+        features_list.append(vtxZ/150.)
+        features=np.array(features_list).reshape(1,10)
+        labels=np.array([trueE.value])
+
+        # load the model from disk
+        print("BDTMuonEnergyPredict Tool: Loading model")
+        loaded_model = pickle.load(open(str(self.weightsfilename), 'rb'))
+
+        #predicting...
+        print("BDTMuonEnergyPredict Tool: Predicting")
+        recoEnergy = loaded_model.predict(features)
+
+        #Set the BDTMuonEnergy in the EnergyReco boost store to be loaded by other tools
+        BDTMuonEnergy=float(recoEnergy[0])
+        EnergyRecoBoostStore.Set("BDTMuonEnergy", BDTMuonEnergy)
+        self.m_data.Stores.at("ANNIEEvent").Set("RecoMuonEnergy", BDTMuonEnergy)#Set the BDTMuonEnergy in the ANNIEEvent store
+        
+        EnergyRecoBoostStore.Save("EnergyRecoStore.bs")#Append each entry to file in case we want to make plots
+
         return 1
     
     def Finalise(self):
@@ -60,84 +171,6 @@ def Initialise():
     return thistool.Initialise()
 
 def Execute():
-# Set TF random seed to improve reproducibility
-    seed = 170
-    np.random.seed(seed)
-    E_low=0
-    E_high=2000
-    div=100
-    bins = int((E_high-E_low)/div)
-    print('bins: ', bins)
-
-    print( "--- opening file with input variables"+str(thistool.inputdatafilename)) 
-    #--- events for prediction ---
-    filein = open(str(thistool.inputdatafilename))
-    print("evts for prediction in: ",filein)
-    df00=pd.read_csv(filein)
-    df0=df00[['totalPMTs','totalLAPPDs','TrueTrackLengthInWater',#'neutrinoE',
-    'trueKE','diffDirAbs','recoTrackLengthInMrd','recoDWallR','recoDWallZ','dirX','dirY','dirZ','vtxX','vtxY','vtxZ','DNNRecoLength']]
-    #dfsel=df0.loc[df0['neutrinoE'] < E_threshold]
-    dfsel=df0
-    
-    #print to check:
-    print("check prediction sample: ",dfsel.head())
-#    print(dfsel.iloc[5:10,0:5])
-    #check fr NaN values:
-    assert(dfsel.isnull().any().any()==False)
-
-    #--- normalisation-prediction sample:
-    dfsel_n = pd.DataFrame([ dfsel['DNNRecoLength']/600., dfsel['recoTrackLengthInMrd']/200., dfsel['diffDirAbs'], dfsel['recoDWallR'], dfsel['recoDWallZ'], dfsel['totalLAPPDs']/200., dfsel['totalPMTs']/200., dfsel['vtxX']/150., dfsel['vtxY']/200., dfsel['vtxZ']/150. ]).T
-    print("chehck normalisation: ", dfsel_n.head())
-
-    #--- prepare prediction sample for BDT:
-    #discard events with no reconstructed mrd tracks
-    MRDTrackLength=dfsel_n['recoTrackLengthInMrd']
-    i=0
-    a=[]
-    for y in MRDTrackLength:
-         if y<0:
-            print("MRDTrackLength:",y,"Event:",i)
-            a.append(i)
-         i=i+1
-    dfsel_n1=dfsel_n.drop(dfsel_n.index[a])
-    dfsel1=dfsel.drop(dfsel.index[a]) 
-    arr_hi_E0 = np.array(dfsel_n1[['DNNRecoLength','recoTrackLengthInMrd','diffDirAbs','recoDWallR','recoDWallZ','totalLAPPDs','totalPMTs','vtxX','vtxY','vtxZ']])
-    arr3_hi_E0 = np.array(dfsel1[['trueKE']])
- 
-    #printing..
-    print(' events for predicting: ',len(arr3_hi_E0)) 
-
-    ########### BDTG ############
-    n_estimators=1000
-
- 
-    # load the model from disk
-    loaded_model = pickle.load(open(str(thistool.modelfilename), 'rb'))
-    #result = loaded_model.score(X_test, Y_test)
-    #print(result) 
-
-    #predicting...
-    print("events for energy reco: ", len(arr3_hi_E0)) 
-    BDTGoutput_E = loaded_model.predict(arr_hi_E0)
-
-    Y=[0 for j in range (0,len(arr3_hi_E0))]
-    for i in range(len(arr3_hi_E0)):
-        Y[i] = 100.*(arr3_hi_E0[i]-BDTGoutput_E[i])/(1.*arr3_hi_E0[i])
-#        print("MC Energy: ", test_data_trueKE_hi_E[i]," Reco Energy: ",BDTGoutput_E[i]," DE/E[%]: ",Y[i])
-
-    df1 = pd.DataFrame(arr3_hi_E0,columns=['MuonEnergy'])
-    df2 = pd.DataFrame(BDTGoutput_E,columns=['RecoE'])
-    df_final = pd.concat([df1,df2],axis=1)
- 
-    #-logical tests:
-    print("checking..."," df0.shape[0]: ",df1.shape[0]," len(y_predicted): ", len(BDTGoutput_E)) 
-    assert(df1.shape[0]==len(BDTGoutput_E))
-    assert(df_final.shape[0]==df2.shape[0])
-
-    #save results to .csv:  
-    if thistool.predictionsdatafilename == 'NA':
-        return 1
-    df_final.to_csv(str(thistool.predictionsdatafilename), float_format = '%.3f')
     return thistool.Execute()
 
 def Finalise():

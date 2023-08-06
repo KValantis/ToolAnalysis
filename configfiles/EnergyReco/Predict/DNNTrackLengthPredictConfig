@@ -3,18 +3,11 @@
 
 PythonScript DNNTrackLengthPredict
 
-verbose 1
+verbose 6
 
-InitialiseFunction Initialise
-ExecuteFunction Execute
-FinaliseFunction Finalise
+# DNN model, weights etc
+TrackLengthWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets_New.hdf5
 
-# model weights file
-TrackLengthWeightsFile UserTools/DNNTrackLength/stand_alone/weights/weights_bets.hdf5
+# Scaling Parameters
 
-# output file for predictions, if we want to make a legacy-style csv output
-TrackLengthPredictionsDataFile Data_Energy_Reco/DNN_predict_output.csv  # use 'NA' to skip
-
-TrackLengthPredictionsInputDataFile Data_Energy_Reco/data_for_RecoLength.csv
-
-UseStore 1
+ScalingVarsBoostStoreFile Data_Energy_Reco/ScalingVarsStore.bs
