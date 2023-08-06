@@ -259,8 +259,8 @@ bool PhaseIITreeMaker::Initialise(std::string configfile, DataModel &data){
       fPhaseIITrigTree->Branch("recoPhi",&fRecoPhi,"recoPhi/D");
       fPhaseIITrigTree->Branch("recoVtxFOM",&fRecoVtxFOM,"recoVtxFOM/D");
       fPhaseIITrigTree->Branch("recoStatus",&fRecoStatus,"recoStatus/I");
-      fPhaseIITrigTree->Branch("DNNRecoLength",&fDNNRecoLength,"DNNRecoLength/D");
-      fPhaseIITrigTree->Branch("BDTMuonEnergy",&fBDTMuonEnergy,"BDTMuonEnergy/D");
+      //fPhaseIITrigTree->Branch("DNNRecoLength",&fDNNRecoLength,"DNNRecoLength/D");
+      //fPhaseIITrigTree->Branch("BDTMuonEnergy",&fBDTMuonEnergy,"BDTMuonEnergy/D");
     }
   
     //MC truth information for muons
@@ -788,8 +788,15 @@ bool PhaseIITreeMaker::Execute(){
       for(int i=0; i < (int) MrdTimeClusters.size(); i++) fNumClusterTracks += this->LoadMRDTrackReco(i);
     }
 
-    bool got_reco = false;
+    bool got_reco = false, got_energy_reco=false;
     if(TankReco_fill) got_reco = this->FillTankRecoInfo();
+    //got_energy_reco = this->FillTrackLengthAndEnergyInfo();
+    //}
+    
+    //std::cout<<"DNNRecoLength is: "<<fDNNRecoLength<<"and it's type is: "<<typeid(fDNNRecoLength).name()<<std::endl;
+    //std::cout<<"BDTMuonEnergy is: "<<fBDTMuonEnergy<<"and it's type is: "<<typeid(fBDTMuonEnergy).name()<<std::endl;
+    //std::cout<<"Type of &fDNNRecoLength: "<<typeid(&fDNNRecoLength).name()<<std::endl;
+    //std::cout<<"Type of &fBDTMuonEnergy: "<<typeid(&fBDTMuonEnergy).name()<<std::endl;
 
     bool gotmctruth = false;
     if(MCTruth_fill)  gotmctruth = this->FillMCTruthInfo();
@@ -801,6 +808,8 @@ bool PhaseIITreeMaker::Execute(){
     if (RecoDebug_fill) this->FillRecoDebugInfo();
 
     fPhaseIITrigTree->Fill();
+    //fPhaseIITrigTree->Show();
+    //fPhaseIITrigTree->Print();
   }
   return true;
 }
@@ -939,8 +948,8 @@ void PhaseIITreeMaker::ResetVariables() {
     fRecoDirZ = -9999;
     fRecoAngle = -9999;
     fRecoPhi = -9999;
-    fDNNRecoLength = -9999;
-    fBDTMuonEnergy = -9999;
+    //fDNNRecoLength = -9999;
+    //fBDTMuonEnergy = -9999;
   }
 
   if(MRDClusterProcessing){
@@ -1411,6 +1420,38 @@ void PhaseIITreeMaker::LoadAllTankHits(bool IsData) {
   return;
 }
 
+bool PhaseIITreeMaker::FillTrackLengthAndEnergyInfo(){
+       bool got_energy_reco_info = true;
+       auto* energy_reco_event = m_data->Stores["EnergyReco"];
+  if (!energy_reco_event) {
+    Log("Error: The PhaseIITreeMaker tool could not find the EnergyReco Store", v_error, verbosity);
+    got_energy_reco_info = false;
+  }
+   //Get reco length and energy
+  auto get_recolength = m_data->Stores.at("EnergyReco")->Get("DNNRecoLength",fDNNRecoLength);
+  if(!get_recolength) {
+    Log("Warning: The PhaseIITreeMaker tool could not find DNNRecoLength. Continuing to build tree", v_message, verbosity);
+    bool got_energy_reco_info = false;
+  }
+  else{
+  std::string type = m_data->Stores.at("EnergyReco")->Type("DNNRecoLength");
+  Log("type of DNNRecoLength entry is :"+type, v_message, verbosity);
+  Log("DNNRecoLength is: "+std::to_string(fDNNRecoLength), v_message, verbosity);
+  }
+  auto get_recoenergy = m_data->Stores.at("EnergyReco")->Get("BDTMuonEnergy",fBDTMuonEnergy);
+  if(!get_recoenergy) {
+    Log("Warning: The PhaseIITreeMaker tool could not find BDTMuonEnergy. Continuing to build tree", v_message, verbosity);
+    bool got_energy_reco_info = false;
+  }
+  else{
+  std::string type = m_data->Stores.at("EnergyReco")->Type("BDTMuonEnergy");
+  Log("type of BDTMuonEnergy entry is :"+type, v_message, verbosity);
+  Log("BDTMuonEnergy is: "+std::to_string(fBDTMuonEnergy), v_message, verbosity);
+  }
+  
+return got_energy_reco_info;
+}
+
 bool PhaseIITreeMaker::FillTankRecoInfo() {
   bool got_reco_info = true;
   auto* reco_event = m_data->Stores["RecoEvent"];
@@ -1449,22 +1490,7 @@ bool PhaseIITreeMaker::FillTankRecoInfo() {
     }
     fRecoStatus = recovtx->GetStatus();
   }
-  //Get reco length and energy
-  double DNNRecoLength, BDTMuonEnergy;
-  auto get_recolength = m_data->Stores.at("EnergyReco")->Get("DNNRecoLength",DNNRecoLength);
-  if(!get_recolength) {
-    Log("Warning: The PhaseIITreeMaker tool could not find DNNRecoLength. Continuing to build tree", v_message, verbosity);
-  }
-  else{
-  fDNNRecoLength=DNNRecoLength;
-  }
-  auto get_recoenergy = m_data->Stores.at("EnergyReco")->Get("BDTMuonEnergy",BDTMuonEnergy);
-  if(!get_recoenergy) {
-    Log("Warning: The PhaseIITreeMaker tool could not find BDTMuonEnergy. Continuing to build tree", v_message, verbosity);
-  }
-  else{
-  fBDTMuonEnergy=BDTMuonEnergy;
-  }
+  
   return got_reco_info;
 }
 

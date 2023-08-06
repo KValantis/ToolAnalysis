@@ -56,14 +56,14 @@ class DNNTrackLengthTrain_Test(Tool):
         
         EnergyRecoBoostStore=cppyy.gbl.BoostStore(True, 2)#define the energy boost store class object to load the variables for the DNN training
         ok=EnergyRecoBoostStore.Initialise(self.inputBoostStorepathname)#read from disk
-        print("Initiliased boost store successfully",ok)
+        print("DNNTrackLengthTrain_Test Tool: Initiliased boost store successfully")
         total_entries = ctypes.c_ulong(0)
         get_ok = EnergyRecoBoostStore.Header.Get("TotalEntries",total_entries)
-        print("Get num of entries of Energy Reco Store: ",get_ok,", entries: ",total_entries.value)
+        print("DNNTrackLengthTrain_Test Tool: Get num of entries of Energy Reco Store: ",get_ok,", entries: ",total_entries.value)
         ievt=ctypes.c_ulong(0)
         while True:
             get_ok=EnergyRecoBoostStore.GetEntry(ievt.value)
-            print("There is an entry in the BoostStore",get_ok)
+            print("DNNTrackLengthTrain_Test Tool: There is an entry in the BoostStore",get_ok)
             if not get_ok:
                 break;
             #When there is no other entry GetEntry() returns false so the while loop stops
@@ -72,59 +72,59 @@ class DNNTrackLengthTrain_Test(Tool):
             ok = EnergyRecoBoostStore.Has("MaxTotalHitsToDNN")
             MaxTotalHitsToDNN=ctypes.c_int(0)
             if ok:
-             print("EnergyRecoBoostStore has entry MaxTotalHitsToDNN: ",ok)
-             print("type of MaxTotalHitsToDNN entry is :",EnergyRecoBoostStore.Type("MaxTotalHitsToDNN"))
-             print("Getting MaxTotalHitsToDNN from EnergyRecoBoostStore")#we are going to use it to instantiate the lambda and digit times vectors
+             print("DNNTrackLengthTrain_Test Tool: EnergyRecoBoostStore has entry MaxTotalHitsToDNN: ",ok)
+             print("DNNTrackLengthTrain_Test Tool: type of MaxTotalHitsToDNN entry is :",EnergyRecoBoostStore.Type("MaxTotalHitsToDNN"))
+             print("DNNTrackLengthTrain_Test Tool: Getting MaxTotalHitsToDNN from EnergyRecoBoostStore")#we are going to use it to instantiate the lambda and digit times vectors
              EnergyRecoBoostStore.Get("MaxTotalHitsToDNN",MaxTotalHitsToDNN)
-            print("MaxTotalHitsToDNN is: ", MaxTotalHitsToDNN.value)
+            print("DNNTrackLengthTrain_Test Tool: MaxTotalHitsToDNN is: ", MaxTotalHitsToDNN.value)
             ok = EnergyRecoBoostStore.Has("lambda_vec")
             lambda_vector=std.vector['double'](range(MaxTotalHitsToDNN.value))
             if ok:
-             print("EnergyRecoBoostStore has entry lambda_vec: ",ok)
-             print("type of lambda_vec entry is :", EnergyRecoBoostStore.Type("lambda_vec"))
-             print("Getting lambda_vec from EnergyRecoBoostStore")
+             print("DNNTrackLengthTrain_Test Tool: EnergyRecoBoostStore has entry lambda_vec: ",ok)
+             print("DNNTrackLengthTrain_Test Tool: type of lambda_vec entry is :", EnergyRecoBoostStore.Type("lambda_vec"))
+             print("DNNTrackLengthTrain_Test Tool: Getting lambda_vec from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("lambda_vec", lambda_vector)
-            print("The lambda for the first digit is: ", lambda_vector.at(0))
+            print("DNNTrackLengthTrain_Test Tool: The lambda for the first digit is: ", lambda_vector.at(0))
             ok = EnergyRecoBoostStore.Has("digit_ts_vec")
             digit_ts_vector=std.vector['double'](range(MaxTotalHitsToDNN.value))
             if ok:
-             print("EnergyRecoBoostStore has entry digit_ts_vec: ",ok)
-             print("type of digit_ts_vec entry is :",EnergyRecoBoostStore.Type("digit_ts_vec"))
-             print("Getting digit_ts_vec from EnergyRecoBoostStore")
+             print("DNNTrackLengthTrain_Test Tool: EnergyRecoBoostStore has entry digit_ts_vec: ",ok)
+             print("DNNTrackLengthTrain_Test Tool: type of digit_ts_vec entry is :",EnergyRecoBoostStore.Type("digit_ts_vec"))
+             print("DNNTrackLengthTrain_Test Tool: Getting digit_ts_vec from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("digit_ts_vec", digit_ts_vector)
-            print("The digit time for the first digit is: ", digit_ts_vector.at(0))
+            print("DNNTrackLengthTrain_Test Tool: The digit time for the first digit is: ", digit_ts_vector.at(0))
             ok = EnergyRecoBoostStore.Has("lambda_max")
             lambda_max=ctypes.c_double(0)
             if ok:
-             print("EnergyRecoBoostStore has entry lambda_max: ",ok)
-             print("type of lambda_max entry is :",EnergyRecoBoostStore.Type("lambda_max"))
-             print("Getting lambda_max from EnergyRecoBoostStore")
+             print("DNNTrackLengthTrain_Test Tool: EnergyRecoBoostStore has entry lambda_max: ",ok)
+             print("DNNTrackLengthTrain_Test Tool: type of lambda_max entry is :",EnergyRecoBoostStore.Type("lambda_max"))
+             print("DNNTrackLengthTrain_Test Tool: Getting lambda_max from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("lambda_max",lambda_max)
-            print("Lambda_max is: ", lambda_max.value)
+            print("DNNTrackLengthTrain_Test Tool: Lambda_max is: ", lambda_max.value)
             ok = EnergyRecoBoostStore.Has("num_pmt_hits")
             num_pmt_hits=ctypes.c_int(0)
             if ok:
-             print("EnergyRecoBoostStore has entry num_pmt_hits: ",ok)
-             print("type of num_pmt_hits entry is :",EnergyRecoBoostStore.Type("num_pmt_hits"))
+             print("DNNTrackLengthTrain_Test Tool: EnergyRecoBoostStore has entry num_pmt_hits: ",ok)
+             print("DNNTrackLengthTrain_Test Tool: type of num_pmt_hits entry is :",EnergyRecoBoostStore.Type("num_pmt_hits"))
              print("Getting num_pmt_hits from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("num_pmt_hits",num_pmt_hits)
-            print("Number of pmt hits is: ", num_pmt_hits.value)
+            print("DNNTrackLengthTrain_Test Tool: Number of pmt hits is: ", num_pmt_hits.value)
             ok = EnergyRecoBoostStore.Has("num_lappd_hits")
             num_lappd_hits=ctypes.c_int(0)
             if ok:
-             print("EnergyRecoBoostStore has entry num_lappd_hits: ",ok)
-             print("type of num_lappd_hits entry is :",EnergyRecoBoostStore.Type("num_lappd_hits"))
-             print("Getting num_lappd_hits from EnergyRecoBoostStore")
+             print("DNNTrackLengthTrain_Test Tool: EnergyRecoBoostStore has entry num_lappd_hits: ",ok)
+             print("DNNTrackLengthTrain_Test Tool: type of num_lappd_hits entry is :",EnergyRecoBoostStore.Type("num_lappd_hits"))
+             print("DNNTrackLengthTrain_Test Tool: Getting num_lappd_hits from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("num_lappd_hits",num_lappd_hits)
-            print("Number of lappd hits is: ", num_lappd_hits.value)
+            print("DNNTrackLengthTrain_Test Tool: Number of lappd hits is: ", num_lappd_hits.value)
             ok = EnergyRecoBoostStore.Has("TrueTrackLengthInWater")
             TrueTrackLengthInWater=ctypes.c_float(0)
             if ok:
-             print("EnergyRecoBoostStore has entry TrueTrackLengthInWater: ",ok)
-             print("type of TrueTrackLengthInWater entry is :",EnergyRecoBoostStore.Type("TrueTrackLengthInWater"))
-             print("Getting TrueTrackLengthInWater from EnergyRecoBoostStore")
+             print("DNNTrackLengthTrain_Test Tool: EnergyRecoBoostStore has entry TrueTrackLengthInWater: ",ok)
+             print("DNNTrackLengthTrain_Test Tool: type of TrueTrackLengthInWater entry is :",EnergyRecoBoostStore.Type("TrueTrackLengthInWater"))
+             print("DNNTrackLengthTrain_Test Tool: Getting TrueTrackLengthInWater from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("TrueTrackLengthInWater",TrueTrackLengthInWater)
-            print("TrueTrackLengthInWater is: ", TrueTrackLengthInWater.value)
+            print("DNNTrackLengthTrain_Test Tool: TrueTrackLengthInWater is: ", TrueTrackLengthInWater.value)
             
             #Create features and labels and preprocess data for the model
             features_list=[]
@@ -179,22 +179,17 @@ class DNNTrackLengthTrain_Test(Tool):
         test_x = features[a:]
         test_y = labels[a:]
 
-        print("train sample features shape: ", train_x.shape," train sample label shape: ", train_y.shape)
-        print("test sample features shape: ", test_x.shape," test sample label shape: ", test_y.shape)
+        print("DNNTrackLengthTrain_Test Tool: train sample features shape: ", train_x.shape," DNNTrackLengthTrain_Test Tool: train sample label shape: ", train_y.shape)
+        print("DNNTrackLengthTrain_Test Tool: test sample features shape: ", test_x.shape," DNNTrackLengthTrain_Test Tool: test sample label shape: ", test_y.shape)
 
         # Scale data (training set) to 0 mean and unit standard deviation.                                                                                                                                             
         scaler = preprocessing.StandardScaler()
         train_x = scaler.fit_transform(train_x)
-        print(train_x.mean(axis=0))
-        print(train_x.std(axis=0))
 
         #Save the scaling parameters from fit_transform for later use in the predict toolchain
         features_mean_values=scaler.mean_
         features_std_values=scaler.scale_
-        print(features_mean_values)
-        print(features_std_values)
-        print(scaler.n_features_in_)
-        print(scaler.n_samples_seen_)
+        
         #Turn into std.vectors() to store in the ScalingVars BoostStore
         features_mean_values_vec=std.vector['double'](range(len(features_mean_values)))
         for i in range(features_mean_values_vec.size()):
@@ -204,11 +199,11 @@ class DNNTrackLengthTrain_Test(Tool):
             features_std_values_vec[j]=features_std_values[j]
         #Create a boost store to store these values
         ScalingVarsStore=cppyy.gbl.BoostStore(True, 0)
-        print("constructed: ",type(ScalingVarsStore))
+        print("DNNTrackLengthTrain_Test Tool: Constructed: ",type(ScalingVarsStore))
         ScalingVarsStore.Set("features_mean_values",features_mean_values_vec)
         ScalingVarsStore.Set("features_std_values",features_std_values_vec)
         #Save BoostStore locally for later use in EnergyRecoPredict toolchain
-        print("Saving boost store with scaling parameters locally for later use")
+        print("DNNTrackLengthTrain_Test Tool: Saving boost store with scaling parameters locally for later use")
         ScalingVarsStore.Save(self.ScalingVarsBoostStorepathname)
         def create_model():
             # create model                                                                                                                                                                                             
@@ -253,10 +248,10 @@ class DNNTrackLengthTrain_Test(Tool):
 
         # Compile model
         model.compile(loss='mean_squared_error', optimizer='Adamax', metrics=['accuracy'])
-        print("Created model and loaded weights from"+filepath+"for testing")
+        print("DNNTrackLengthTrain_Test Tool: Created model and loaded weights from"+filepath+"for testing")
 
         ## Predict.
-        print('predicting...')
+        print('DNNTrackLengthTrain_Test Tool: Predicting...')
         x_transformed = scaler.transform(test_x)
         y_predicted = model.predict(x_transformed)
 

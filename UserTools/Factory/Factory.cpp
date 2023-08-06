@@ -165,5 +165,6 @@ if (tool=="VtxSeedFineGrid") ret=new VtxSeedFineGrid;
 if (tool=="ReweightEventsGenie") ret=new ReweightEventsGenie;
 if (tool=="FilterLAPPDEvents") ret=new FilterLAPPDEvents;
 if (tool=="Stage1DataBuilder") ret=new Stage1DataBuilder;
+if (tool=="PlotsTrackLengthAndEnergy") ret=new PlotsTrackLengthAndEnergy;
 return ret;
 }

@@ -173,3 +173,4 @@
 #include "ReweightEventsGenie.h"
 #include "FilterLAPPDEvents.h"
 #include "Stage1DataBuilder.h"
+#include "PlotsTrackLengthAndEnergy.h"

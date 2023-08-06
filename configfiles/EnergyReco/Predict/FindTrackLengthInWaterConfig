@@ -2,3 +2,5 @@
 # all variables retrieved with m_variables.Get() must be defined here!
 verbosity 1
 MaxTotalHitsToDNN 1100
+
+OutputDataFile beamlikeEvts.csv

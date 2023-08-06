@@ -29,7 +29,6 @@ class BDTMuonEnergyTrain_Test(Tool):
     def Initialise(self):
         self.m_log.Log(__file__+" Initialising", self.v_debug, self.m_verbosity)
         self.m_variables.Print()
-        self.m_variables.Get("BDT_NuE_threshold", self.E_threshold)
         self.m_variables.Get("BDTMuonEnergyWeightsFile", self.weightsfilename)
         self.m_variables.Get("BDTMuonEnergyTrainingInputBoostStoreFile", self.inputBoostStorepathname)
         return 1
@@ -42,14 +41,14 @@ class BDTMuonEnergyTrain_Test(Tool):
         
         EnergyRecoBoostStore=cppyy.gbl.BoostStore(True, 2)#define the energy boost store class object to load the variables for the BDT training
         ok=EnergyRecoBoostStore.Initialise(self.inputBoostStorepathname)#read from disk
-        print("Initiliased boost store successfully",ok)
+        print("BDTMuonEnergyTrain_Test Tool: Initiliased boost store successfully",ok)
         total_entries = ctypes.c_ulong(0)
         get_ok = EnergyRecoBoostStore.Header.Get("TotalEntries",total_entries)
-        print("Get num of entries of Energy Reco Store: ",get_ok,", entries: ",total_entries.value)
+        print("BDTMuonEnergyTrain_Test Tool: Get num of entries of Energy Reco Store: ",get_ok,", entries: ",total_entries.value)
         ievt=ctypes.c_ulong(0)
         while True:
             get_ok=EnergyRecoBoostStore.GetEntry(ievt.value)
-            print("There is an entry in the BoostStore",get_ok)
+            print("BDTMuonEnergyTrain_Test Tool: There is an entry in the BoostStore",get_ok)
             if not get_ok:
                 break;
             #When there is no other entry GetEntry() returns false so the while loop stops
@@ -58,72 +57,72 @@ class BDTMuonEnergyTrain_Test(Tool):
             ok = EnergyRecoBoostStore.Has("num_pmt_hits")
             num_pmt_hits=ctypes.c_int(0)
             if ok:
-             print("EnergyRecoBoostStore has entry num_pmt_hits: ",ok)
-             print("type of num_pmt_hits entry is :",EnergyRecoBoostStore.Type("num_pmt_hits"))
-             print("Getting num_pmt_hits from EnergyRecoBoostStore")
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry num_pmt_hits: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of num_pmt_hits entry is :",EnergyRecoBoostStore.Type("num_pmt_hits"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting num_pmt_hits from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("num_pmt_hits",num_pmt_hits)
-            print("Number of pmt hits is: ", num_pmt_hits.value)
+            print("BDTMuonEnergyTrain_Test Tool: Number of pmt hits is: ", num_pmt_hits.value)
             ok = EnergyRecoBoostStore.Has("num_lappd_hits")
             num_lappd_hits=ctypes.c_int(0)
             if ok:
-             print("EnergyRecoBoostStore has entry num_lappd_hits: ",ok)
-             print("type of num_lappd_hits entry is :",EnergyRecoBoostStore.Type("num_lappd_hits"))
-             print("Getting num_lappd_hits from EnergyRecoBoostStore")
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry num_lappd_hits: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of num_lappd_hits entry is :",EnergyRecoBoostStore.Type("num_lappd_hits"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting num_lappd_hits from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("num_lappd_hits",num_lappd_hits)
-            print("Number of lappd hits is: ", num_lappd_hits.value)
+            print("BDTMuonEnergyTrain_Test Tool: Number of lappd hits is: ", num_lappd_hits.value)
             ok = EnergyRecoBoostStore.Has("recoTrackLengthInMrd")
             recoTrackLengthInMrd=ctypes.c_double(0)
             if ok:
-             print("EnergyRecoBoostStore has entry recoTrackLengthInMrd: ",ok)
-             print("type of recoTrackLengthInMrd entry is :",EnergyRecoBoostStore.Type("recoTrackLengthInMrd"))
-             print("Getting recoTrackLengthInMrd from EnergyRecoBoostStore")
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry recoTrackLengthInMrd: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of recoTrackLengthInMrd entry is :",EnergyRecoBoostStore.Type("recoTrackLengthInMrd"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting recoTrackLengthInMrd from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("recoTrackLengthInMrd",recoTrackLengthInMrd)
-            print("The reconstructed track length in the MRD is: ", recoTrackLengthInMrd.value)
-            ok = EnergyRecoBoostStore.Has("diffDirAbs2")
+            print("BDTMuonEnergyTrain_Test Tool: The reconstructed track length in the MRD is: ", recoTrackLengthInMrd.value)
+            ok = EnergyRecoBoostStore.Has("diffDirAbs")
             diffDirAbs=ctypes.c_float(0)
             if ok:
-             print("EnergyRecoBoostStore has entry diffDirAbs: ",ok)
-             print("type of diffDirAbs entry is :",EnergyRecoBoostStore.Type("diffDirAbs2"))
-             print("Getting diffDirAbs from EnergyRecoBoostStore")
-             EnergyRecoBoostStore.Get("diffDirAbs2",diffDirAbs)
-            print("DiffDirAbs is: ", diffDirAbs.value)
-            ok = EnergyRecoBoostStore.Has("recoDWallR2")
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry diffDirAbs: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of diffDirAbs entry is :",EnergyRecoBoostStore.Type("diffDirAbs"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting diffDirAbs from EnergyRecoBoostStore")
+             EnergyRecoBoostStore.Get("diffDirAbs",diffDirAbs)
+            print("BDTMuonEnergyTrain_Test Tool: DiffDirAbs is: ", diffDirAbs.value)
+            ok = EnergyRecoBoostStore.Has("recoDWallR")
             recoDWallR=ctypes.c_float(0)
             if ok:
-             print("EnergyRecoBoostStore has entry recoDWallR: ",ok)
-             print("type of recoDWallR entry is :",EnergyRecoBoostStore.Type("recoDWallR2"))
-             print("Getting recoDWallR from EnergyRecoBoostStore")
-             EnergyRecoBoostStore.Get("recoDWallR2",recoDWallR)
-            print("RecoDWallR is: ", recoDWallR.value)
-            ok = EnergyRecoBoostStore.Has("recoDWallZ2")
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry recoDWallR: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of recoDWallR entry is :",EnergyRecoBoostStore.Type("recoDWallR"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting recoDWallR from EnergyRecoBoostStore")
+             EnergyRecoBoostStore.Get("recoDWallR",recoDWallR)
+            print("BDTMuonEnergyTrain_Test Tool: RecoDWallR is: ", recoDWallR.value)
+            ok = EnergyRecoBoostStore.Has("recoDWallZ")
             recoDWallZ=ctypes.c_float(0)
             if ok:
-             print("EnergyRecoBoostStore has entry recoDWallZ: ",ok)
-             print("type of recoDWallZ entry is :",EnergyRecoBoostStore.Type("recoDWallZ2"))
-             print("Getting recoDWallZ from EnergyRecoBoostStore")
-             EnergyRecoBoostStore.Get("recoDWallZ2",recoDWallZ)
-            print("RecoDWallZ is: ", recoDWallZ.value)
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry recoDWallZ: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of recoDWallZ entry is :",EnergyRecoBoostStore.Type("recoDWallZ"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting recoDWallZ from EnergyRecoBoostStore")
+             EnergyRecoBoostStore.Get("recoDWallZ",recoDWallZ)
+            print("BDTMuonEnergyTrain_Test Tool: RecoDWallZ is: ", recoDWallZ.value)
             ok = EnergyRecoBoostStore.Has("vtxVec")
             vtx_position=cppyy.gbl.Position()
             if ok:
-             print("EnergyRecoBoostStore has entry vtxVec: ",ok)
-             print("type of vtxVec entry is :", EnergyRecoBoostStore.Type("vtxVec"))
-             print("Getting vtxVec from EnergyRecoBoostStore")
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry vtxVec: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of vtxVec entry is :", EnergyRecoBoostStore.Type("vtxVec"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting vtxVec from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("vtxVec", vtx_position)
             vtxX=vtx_position.X()
-            print("VtxX is: ", vtxX)
+            print("BDTMuonEnergyTrain_Test Tool: VtxX is: ", vtxX)
             vtxY=vtx_position.Y()
-            print("VtxY is: ", vtxY)
+            print("BDTMuonEnergyTrain_Test Tool: VtxY is: ", vtxY)
             vtxZ=vtx_position.Z()
-            print("VtxZ is: ", vtxZ)
+            print("BDTMuonEnergyTrain_Test Tool: VtxZ is: ", vtxZ)
             ok = EnergyRecoBoostStore.Has("trueE")
             trueE=ctypes.c_double(0)
             if ok:
-             print("EnergyRecoBoostStore has entry trueE: ",ok)
-             print("type of trueE entry is :",EnergyRecoBoostStore.Type("trueE"))
-             print("Getting trueE from EnergyRecoBoostStore")
+             print("BDTMuonEnergyTrain_Test Tool: EnergyRecoBoostStore has entry trueE: ",ok)
+             print("BDTMuonEnergyTrain_Test Tool: type of trueE entry is :",EnergyRecoBoostStore.Type("trueE"))
+             print("BDTMuonEnergyTrain_Test Tool: Getting trueE from EnergyRecoBoostStore")
              EnergyRecoBoostStore.Get("trueE",trueE)
-            print("The MC muon energy is: ", trueE.value)
+            print("BDTMuonEnergyTrain_Test Tool: The MC muon energy is: ", trueE.value)
             #Create features and labels and preprocess data for the model
             features_list=[]
             features_list.append(recoTrackLengthInMrd.value/200.)
@@ -146,6 +145,7 @@ class BDTMuonEnergyTrain_Test(Tool):
                 features=np.vstack([features,featuresforthisentry])
                 labels=np.vstack([labels,labelsforthisentry])
             ievt.value+=1
+
         print(features)
         print(features.shape)
         print(labels)
@@ -175,7 +175,7 @@ class BDTMuonEnergyTrain_Test(Tool):
         labels = labels[a:]
 
         num_events, num_pixels = features.shape
-        print("With DNN Reco Length",num_events, num_pixels)
+        print("BDTMuonEnergyTrain_Test Tool: Events with DNNRecoLength: ", num_events, num_pixels)
         
         #Get the DNN reconstructed track length in the water tank from RecoLength boost store
         #Get the RecoLength Boost Store from DataModel
@@ -183,11 +183,11 @@ class BDTMuonEnergyTrain_Test(Tool):
         ok = DNNRecoLengthBoostStore.Has("DNNRecoLength")
         DNNRecoLength_vector=std.vector[float](range(num_events))
         if ok:
-            print("RecoLengthBoostStore has entry DNNRecoLength: ",ok)
-            print("type of DNNRecoLength entry is :", DNNRecoLengthBoostStore.Type("DNNRecoLength"))
-            print("Getting DNNRecoLength from RecoLengthBoostStore")
+            print("BDTMuonEnergyTrain_Test Tool: DNNRecoLengthBoostStore has entry DNNRecoLength: ",ok)
+            print("BDTMuonEnergyTrain_Test Tool: type of DNNRecoLength entry is :", DNNRecoLengthBoostStore.Type("DNNRecoLength"))
+            print("BDTMuonEnergyTrain_Test Tool: Getting DNNRecoLength from DNNRecoLengthBoostStore")
             DNNRecoLengthBoostStore.Get("DNNRecoLength", DNNRecoLength_vector)
-            print("The DNNRecoLength for the first event: ", DNNRecoLength_vector.at(0))
+            print("BDTMuonEnergyTrain_Test Tool: The DNNRecoLength for the first event: ", DNNRecoLength_vector.at(0))
         DNNRecoLength_list=[]
         for i in range(DNNRecoLength_vector.size()):
                  DNNRecoLength_list.append(DNNRecoLength_vector.at(i)/600.)
@@ -195,7 +195,7 @@ class BDTMuonEnergyTrain_Test(Tool):
         #Place the DNNRecoLength in the dataset
         features=np.concatenate((DNNRecoLength, features), axis=1)
         print(features)
-        print("Features shape after adding DNNRecoLength",features.shape)
+        print("BDTMuonEnergyTrain_Test Tool: Features shape after adding DNNRecoLength",features.shape)
 
         DNNRecoLength_new=features[:,0]
         #This loop excludes any events with reconstructed length >1000 as not well reconstructed
@@ -221,10 +221,10 @@ class BDTMuonEnergyTrain_Test(Tool):
         test_X = features[offset:] # test sample
         test_Y = labels[offset:].reshape(-1)#reshape for model
 
-        print("train shape: ", train_X.shape," label: ", train_Y.shape)
-        print("test shape: ", test_X.shape," label: ", test_Y.shape)
+        print("BDTMuonEnergyTrain_Test Tool: train shape: ", train_X.shape," label: ", train_Y.shape)
+        print("BDTMuonEnergyTrain_Test Tool: test shape: ", test_X.shape," label: ", test_Y.shape)
 
-        print("training BDTG...")
+        print("BDTMuonEnergyTrain_Test Tool: Training BDTG...")
         net_hi_E = ensemble.GradientBoostingRegressor(**params)
         model = net_hi_E.fit(train_X, train_Y)
         net_hi_E
@@ -234,10 +234,10 @@ class BDTMuonEnergyTrain_Test(Tool):
         pickle.dump(model, open(filename, 'wb'))
 
         mse = mean_squared_error(test_Y, net_hi_E.predict(test_X))
-        print("MSE: %.4f" % mse)
-        print("events at training & test samples: ", len(labels))
-        print("events at train sample: ", len(train_Y))
-        print("events at test sample: ", len(test_Y))
+        print("BDTMuonEnergyTrain_Test Tool: MSE: %.4f" % mse)
+        print("BDTMuonEnergyTrain_Test Tool: events at training & test samples: ", len(labels))
+        print("BDTMuonEnergyTrain_Test Tool: events at train sample: ", len(train_Y))
+        print("BDTMuonEnergyTrain_Test Tool: events at test sample: ", len(test_Y))
 
         test_score = np.zeros((params['n_estimators'],), dtype=np.float64)
 

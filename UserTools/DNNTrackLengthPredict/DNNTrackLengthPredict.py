@@ -75,62 +75,62 @@ class DNNTrackLengthPredict(Tool):
         get_ok = EnergyRecoBoostStore.Has("MaxTotalHitsToDNN")
         MaxTotalHitsToDNN=ctypes.c_int(0)
         if not get_ok:
-            print("There is no entry in Energy Reco boost store.")
+            print("DNNTrackLengthPredict Tool: There is no entry in Energy Reco boost store.")
             return 1
         if get_ok:
-            print("EnergyRecoBoostStore has entry MaxTotalHitsToDNN: ",get_ok)
-            print("type of MaxTotalHitsToDNN entry is :",EnergyRecoBoostStore.Type("MaxTotalHitsToDNN"))
-            print("Getting MaxTotalHitsToDNN from EnergyRecoBoostStore")#we are going to use it to instantiate the lambda and digit times vectors
+            print("DNNTrackLengthPredict Tool: EnergyRecoBoostStore has entry MaxTotalHitsToDNN: ",get_ok)
+            print("DNNTrackLengthPredict Tool: type of MaxTotalHitsToDNN entry is :",EnergyRecoBoostStore.Type("MaxTotalHitsToDNN"))
+            print("DNNTrackLengthPredict Tool: Getting MaxTotalHitsToDNN from EnergyRecoBoostStore")#we are going to use it to instantiate the lambda and digit times vectors
             EnergyRecoBoostStore.Get("MaxTotalHitsToDNN",MaxTotalHitsToDNN)
-        print("MaxTotalHitsToDNN is: ", MaxTotalHitsToDNN.value)
+        print("DNNTrackLengthPredict Tool: MaxTotalHitsToDNN is: ", MaxTotalHitsToDNN.value)
         ok = EnergyRecoBoostStore.Has("lambda_vec")
         lambda_vector=std.vector['double'](range(MaxTotalHitsToDNN.value))
         if ok:
-            print("EnergyRecoBoostStore has entry lambda_vec: ",ok)
-            print("type of lambda_vec entry is :", EnergyRecoBoostStore.Type("lambda_vec"))
-            print("Getting lambda_vec from EnergyRecoBoostStore")
+            print("DNNTrackLengthPredict Tool: EnergyRecoBoostStore has entry lambda_vec: ",ok)
+            print("DNNTrackLengthPredict Tool: type of lambda_vec entry is :", EnergyRecoBoostStore.Type("lambda_vec"))
+            print("DNNTrackLengthPredict Tool: Getting lambda_vec from EnergyRecoBoostStore")
             EnergyRecoBoostStore.Get("lambda_vec", lambda_vector)
-        print("The lambda for the first digit is: ", lambda_vector.at(0))
+        print("DNNTrackLengthPredict Tool: The lambda for the first digit is: ", lambda_vector.at(0))
         ok = EnergyRecoBoostStore.Has("digit_ts_vec")
         digit_ts_vector=std.vector['double'](range(MaxTotalHitsToDNN.value))
         if ok:
-            print("EnergyRecoBoostStore has entry digit_ts_vec: ",ok)
-            print("type of digit_ts_vec entry is :",EnergyRecoBoostStore.Type("digit_ts_vec"))
-            print("Getting digit_ts_vec from EnergyRecoBoostStore")
+            print("DNNTrackLengthPredict Tool: EnergyRecoBoostStore has entry digit_ts_vec: ",ok)
+            print("DNNTrackLengthPredict Tool: type of digit_ts_vec entry is :",EnergyRecoBoostStore.Type("digit_ts_vec"))
+            print("DNNTrackLengthPredict Tool: Getting digit_ts_vec from EnergyRecoBoostStore")
             EnergyRecoBoostStore.Get("digit_ts_vec", digit_ts_vector)
-        print("The digit time for the first digit is: ", digit_ts_vector.at(0))
+        print("DNNTrackLengthPredict Tool: The digit time for the first digit is: ", digit_ts_vector.at(0))
         ok = EnergyRecoBoostStore.Has("lambda_max")
         lambda_max=ctypes.c_double(0)
         if ok:
-            print("EnergyRecoBoostStore has entry lambda_max: ",ok)
-            print("type of lambda_max entry is :",EnergyRecoBoostStore.Type("lambda_max"))
-            print("Getting lambda_max from EnergyRecoBoostStore")
+            print("DNNTrackLengthPredict Tool: EnergyRecoBoostStore has entry lambda_max: ",ok)
+            print("DNNTrackLengthPredict Tool: type of lambda_max entry is :",EnergyRecoBoostStore.Type("lambda_max"))
+            print("DNNTrackLengthPredict Tool: Getting lambda_max from EnergyRecoBoostStore")
             EnergyRecoBoostStore.Get("lambda_max",lambda_max)
-        print("Lambda_max is: ", lambda_max.value)
+        print("DNNTrackLengthPredict Tool: Lambda_max is: ", lambda_max.value)
         ok = EnergyRecoBoostStore.Has("num_pmt_hits")
         num_pmt_hits=ctypes.c_int(0)
         if ok:
-            print("EnergyRecoBoostStore has entry num_pmt_hits: ",ok)
-            print("type of num_pmt_hits entry is :",EnergyRecoBoostStore.Type("num_pmt_hits"))
-            print("Getting num_pmt_hits from EnergyRecoBoostStore")
+            print("DNNTrackLengthPredict Tool: EnergyRecoBoostStore has entry num_pmt_hits: ",ok)
+            print("DNNTrackLengthPredict Tool: type of num_pmt_hits entry is :",EnergyRecoBoostStore.Type("num_pmt_hits"))
+            print("DNNTrackLengthPredict Tool: Getting num_pmt_hits from EnergyRecoBoostStore")
             EnergyRecoBoostStore.Get("num_pmt_hits",num_pmt_hits)
-        print("Number of pmt hits is: ", num_pmt_hits.value)
+        print("DNNTrackLengthPredict Tool: Number of pmt hits is: ", num_pmt_hits.value)
         ok = EnergyRecoBoostStore.Has("num_lappd_hits")
         num_lappd_hits=ctypes.c_int(0)
         if ok:
-            print("EnergyRecoBoostStore has entry num_lappd_hits: ",ok)
-            print("type of num_lappd_hits entry is :",EnergyRecoBoostStore.Type("num_lappd_hits"))
-            print("Getting num_lappd_hits from EnergyRecoBoostStore")
+            print("DNNTrackLengthPredict Tool: EnergyRecoBoostStore has entry num_lappd_hits: ",ok)
+            print("DNNTrackLengthPredict Tool: type of num_lappd_hits entry is :",EnergyRecoBoostStore.Type("num_lappd_hits"))
+            print("DNNTrackLengthPredict Tool: Getting num_lappd_hits from EnergyRecoBoostStore")
             EnergyRecoBoostStore.Get("num_lappd_hits",num_lappd_hits)
-        print("Number of lappd hits is: ", num_lappd_hits.value)
+        print("DNNTrackLengthPredict Tool: Number of lappd hits is: ", num_lappd_hits.value)
         ok = EnergyRecoBoostStore.Has("TrueTrackLengthInWater")
         TrueTrackLengthInWater=ctypes.c_float(0)
         if ok:
-            print("EnergyRecoBoostStore has entry TrueTrackLengthInWater: ",ok)
-            print("type of TrueTrackLengthInWater entry is :",EnergyRecoBoostStore.Type("TrueTrackLengthInWater"))
-            print("Getting TrueTrackLengthInWater from EnergyRecoBoostStore")
+            print("DNNTrackLengthPredict Tool: EnergyRecoBoostStore has entry TrueTrackLengthInWater: ",ok)
+            print("DNNTrackLengthPredict Tool: type of TrueTrackLengthInWater entry is :",EnergyRecoBoostStore.Type("TrueTrackLengthInWater"))
+            print("DNNTrackLengthPredict Tool: Getting TrueTrackLengthInWater from EnergyRecoBoostStore")
             EnergyRecoBoostStore.Get("TrueTrackLengthInWater",TrueTrackLengthInWater)
-        print("TrueTrackLengthInWater is: ", TrueTrackLengthInWater.value)
+        print("DNNTrackLengthPredict Tool: TrueTrackLengthInWater is: ", TrueTrackLengthInWater.value)
             
         #Create features and labels and preprocess data for the model
         features_list=[]
@@ -164,46 +164,46 @@ class DNNTrackLengthPredict(Tool):
         for i in range(len(features)):
             test_x.append((features[i]-features_mean_values_vec.at(i))/features_std_values_vec.at(i))
         test_X=np.array(test_x).reshape(1,2203)
-        
-        print("defining the model")
+
+        print("DNNTrackLengthPredict Tool: Defining the model")
         model = Sequential()
-        print("adding layers")
+        print("DNNTrackLengthPredict Tool: Adding layers")
         model.add(Dense(25, input_dim=2203, kernel_initializer='normal', activation='relu'))
         model.add(Dense(25, kernel_initializer='normal', activation='relu'))
         model.add(Dense(1, kernel_initializer='normal', activation='relu'))
 
         # load weights                                                                                                                                                                                                 
-        print("loading weights from file ", self.weightsfilename)
+        print("DNNTrackLengthPredict Tool: Loading weights from file ", self.weightsfilename)
         model.load_weights(str(self.weightsfilename))
 
         # Compile model                                                                                                                                                                                                
-        print("compiling model")
+        print("DNNTrackLengthPredict Tool: Compiling model")
         model.compile(loss='mean_squared_error', optimizer='Adamax', metrics=['accuracy'])
-        print("Created model and loaded weights from file", self.weightsfilename)
+        print("DNNTrackLengthPredict Tool: Created model and loaded weights from file", self.weightsfilename)
 
         # Score accuracy / Make predictions                                                                                                                                                                            
         #----------------------------------                                                                                                                                                                            
-        print('predicting...')
+        print('DNNTrackLengthPredict Tool: Predicting...')
         y_predicted = model.predict(test_X)
         print(y_predicted.shape)
 
         # estimate accuracy on dataset using loaded weights                                                                                                                                                            
-        print("evalulating model on test")
+        print("DNNTrackLengthPredict Tool: Evalulating model on test")
         scores = model.evaluate(test_X, labels, verbose=0)
         print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
         # Score with sklearn.
         print("scoring sk mse")
         score_sklearn = metrics.mean_squared_error(y_predicted, labels)
-        print("True:",y_predicted,"Reco:",labels)
         print('MSE (sklearn): {0:f}'.format(score_sklearn))
         
-        print("clearing session")
+        print("DNNTrackLengthPredict Tool: Clearing session")
         K.clear_session()
 
         #Set the DNNRecoLength in the EnergyReco boost store for next tools
-        DNNRecoLength=ctypes.c_double(y_predicted[0])
+        DNNRecoLength=float(y_predicted[0])
         EnergyRecoBoostStore.Set("DNNRecoLength", DNNRecoLength)
+        self.m_data.Stores.at("ANNIEEvent").Set("RecoTrackLengthInTank", DNNRecoLength)#Set the DNNRecoLength in the ANNIEEvent store
         return 1
         
     def Finalise(self):

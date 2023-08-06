@@ -29,7 +29,7 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
     // writing header row
     csvfile.open(OutputDataFile,std::fstream::out);
     if(!csvfile.is_open()){
-     Log("FinDTrackLengthInWater Tool: Failed to open "+OutputDataFile+" for writing headers",v_error,verbosity);
+     Log("FindTrackLengthInWater Tool: Failed to open "+OutputDataFile+" for writing headers",v_error,verbosity);
     }
     for (int i=0; i<maxhits0;++i){
        csvfile<<"l_"<<i<<",";
@@ -38,10 +38,9 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
        csvfile<<"T_"<<i<<",";
     }
     csvfile<<"lambda_max,"  //first estimation of track length(using photons projection on track)
-           //<<"digitT,"
            <<"totalPMTs,"   // number of PMT hits, not number of pmts.
            <<"totalLAPPDs," // number of LAPPD hits... 
-           <<"lambda_max,"  // ... again...?
+           <<"lambda_max,"  // again for stand_alone scripts
            <<"TrueTrackLengthInWater,"
            //<<"neutrinoE,"
            <<"trueKE,"      // energy of the primary muon
@@ -49,10 +48,10 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
            <<"TrueTrackLengthInMrd,"
            <<"recoDWallR,"
            <<"recoDWallZ,"
-           <<"dirX,"        // of the reconstructed muon
+           <<"dirX,"        // the reconstructed direction of the muon
            <<"dirY,"
            <<"dirZ,"
-           <<"vtxX,"        // of the reconstructed event
+           <<"vtxX,"        // the reconstructed vertex of the muon
            <<"vtxY,"
            <<"vtxZ,"
            <<"recoVtxFOM,"
@@ -66,7 +65,7 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
   //Create BoostStore to store the variables for track length and energy reco
   BoostStore* energystore;
   energystore = new BoostStore(true,2); // type is multi-entry binary file
-  m_data->Stores.emplace("EnergyReco",energystore);
+  m_data->Stores.emplace("EnergyReco",energystore);// place boost store in the DataModel
   
   // Get values from Config file
   // ===========================
@@ -76,11 +75,8 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
     maxhits0=1100;
   }
   Log("FindTrackLengthInWater Tool: max number of hits per event: "+to_string(maxhits0),v_debug,verbosity);
-  if(maxhits0>1100){
-    std::cerr<<" Please change the dim of double lambda_vec[1100]={0.}; double digitt[1100]={0.}; from 1100 to max number of hits"<<std::endl;
-  }
   
-  // Get variables from ANNIEEvent
+  // Get geometry variables from ANNIEEvent
   // =============================
   get_ok = m_data->Stores.at("ANNIEEvent")->Header->Get("AnnieGeometry",anniegeom);
   if(not get_ok){
@@ -91,9 +87,6 @@ bool FindTrackLengthInWater::Initialise(std::string configfile, DataModel &data)
   std::cout<<"Tank radius is "<<tank_radius<<std::endl;
   tank_halfheight = anniegeom->GetTankHalfheight()*100.;
   std::cout<<"Tank halfheight is "<<tank_halfheight<<std::endl;
-
-  tank_radius=152.4;
-  tank_halfheight=396.;
   return true;
 }
 
@@ -130,10 +123,10 @@ bool FindTrackLengthInWater::Execute(){
      Log("FindTrackLengthInWater Tool: Vertex reconstruction failed, skipping",v_message,verbosity);
      return true;
    }
-   Log("FindTrackLengthInWater Tool: Vertex reco cuts passed",v_debug,verbosity);
+   Log("FindTrackLengthInWater Tool: Vertex reconstruction cuts passed",v_debug,verbosity);
    count3++;
    
-     //Get the reco MRDTrackLength
+     //Get the reconstructed MRDTrackLength from CStore
      std::vector<std::vector<int>> MrdTimeClusters;
      std::vector<BoostStore>* theMrdTracks;
      int numtracksinev;
@@ -163,8 +156,8 @@ bool FindTrackLengthInWater::Execute(){
     MRDTrackLength = sqrt(pow((StopVertex.X()-StartVertex.X()),2)+pow(StopVertex.Y()-StartVertex.Y(),2)+pow(StopVertex.Z()-StartVertex.Z(),2)) * 100.0;
       }
       }
-      if(MRDTrackLength<=0.)
-      {
+      //Don't use events without reconstructed track length in the MRD
+      if(MRDTrackLength<=0.){
       Log("FindTrackLengthInWater Tool: MRD reconstruction failed, skipping",v_message,verbosity);
       return true;
       }
@@ -187,19 +180,27 @@ bool FindTrackLengthInWater::Execute(){
    std::vector<double> digitT;
    
    // get reconstructed vertex and direction info
-   Log("FindTrackLengthInWater Tool: Getting recovertex and dir",v_debug,verbosity);
+   Log("FindTrackLengthInWater Tool: Getting reco vertex and direction components",v_debug,verbosity);
    vtxX = theExtendedVertex->GetPosition().X();
    vtxY = theExtendedVertex->GetPosition().Y();
    vtxZ = theExtendedVertex->GetPosition().Z();
    dirX = theExtendedVertex->GetDirection().X();
    dirY = theExtendedVertex->GetDirection().Y();
    dirZ = theExtendedVertex->GetDirection().Z();
-   std::cout<<vtxX<<"this is the reco vtxX"<<std::endl;
+   
    // get additional primary muon info from RecoEvent store
    Log("FindTrackLengthInWater Tool: Getting primary muon info",v_debug,verbosity);
    double TrueTrackLengthInWater;
-   auto get_tankTrackLength = m_data->Stores.at("RecoEvent")->Get("TrueTrackLengthInWater", TrueTrackLengthInWater); 
+   auto get_tankTrackLength = m_data->Stores.at("RecoEvent")->Get("TrueTrackLengthInWater", TrueTrackLengthInWater);
+   if(not get_tankTrackLength){
+   Log("FindTrackLengthInWater Tool: Failed to retrieve the TrueTrackLengthInWater from RecoEvent Store!",v_error,verbosity);
+   return false;
+   }
    auto get_muonMCEnergy = m_data->Stores.at("RecoEvent")->Get("TrueMuonEnergy", trueEnergy);
+   if(not get_muonMCEnergy){
+   Log("FindTrackLengthInWater Tool: Failed to retrieve the TrueMuonEnergy from RecoEvent Store!",v_error,verbosity);
+   return false;
+   }
    
    /*// Get neutrino info needed for neutrino energy BDT training
    get_ok = m_data->Stores.at("GenieEvent")->Get("TrueNeutrinoEnergy", TrueNeutrinoEnergy);
@@ -211,11 +212,16 @@ bool FindTrackLengthInWater::Execute(){
    
    // get digits from RecoDigit store
    std::vector<RecoDigit>* digitList;
-   m_data->Stores.at("RecoEvent")->Get("RecoDigit", digitList);
+   auto get_digits=m_data->Stores.at("RecoEvent")->Get("RecoDigit", digitList);
+   if(not get_digits){
+   Log("FindTrackLengthInWater Tool: Failed to retrieve the RecoDigit from RecoEvent Store!",v_error,verbosity);
+   return false;
+   }
    // Extract the PMT & LAPPD digit information
    // ===============================
    int totalPMTs =0; // number of digits from PMT hits in the event
   int totalLAPPDs = 0; // number of digits from LAPPD hits in the event
+  //loop through all digits
   for(RecoDigit &adigit : *digitList){
 	  digitX.push_back(adigit.GetPosition().X());
 	  digitY.push_back(adigit.GetPosition().Y());
@@ -274,7 +280,7 @@ bool FindTrackLengthInWater::Execute(){
        
        digitT.resize(maxhits0);
        
-       // put max nhits into store for use in the next tool
+       //put MaxTotalHitsToDNN in store for use in the next tools
        m_data->Stores.at("EnergyReco")->Set("MaxTotalHitsToDNN",maxhits0);
        
        // put the last successfully processed event number in the EnergyReco store as well.
@@ -299,13 +305,12 @@ bool FindTrackLengthInWater::Execute(){
         m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInWater",TrueTrackLengthInWater2);
         //m_data->Stores.at("EnergyReco")->Set("trueNeuE",TrueNeutrinoEnergy);
         m_data->Stores.at("EnergyReco")->Set("trueE",trueEnergy);
-        m_data->Stores.at("EnergyReco")->Set("diffDirAbs2",diffDirAbs2);
-        m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInMrd2",TrueTrackLengthInMrd2);
-        m_data->Stores.at("EnergyReco")->Set("recoDWallR2",recoDWallR2);
-        m_data->Stores.at("EnergyReco")->Set("recoDWallZ2",recoDWallZ2);
+        m_data->Stores.at("EnergyReco")->Set("diffDirAbs",diffDirAbs2);
+        //m_data->Stores.at("EnergyReco")->Set("TrueTrackLengthInMrd",TrueTrackLengthInMrd2);
+        m_data->Stores.at("EnergyReco")->Set("recoDWallR",recoDWallR2);
+        m_data->Stores.at("EnergyReco")->Set("recoDWallZ",recoDWallZ2);
         m_data->Stores.at("EnergyReco")->Set("dirVec",theExtendedVertex->GetDirection());
         m_data->Stores.at("EnergyReco")->Set("vtxVec",theExtendedVertex->GetPosition());
-        m_data->Stores.at("EnergyReco")->Set("recoVtxFOM",recoVtxFOM);
         m_data->Stores.at("EnergyReco")->Set("recoTrackLengthInMrd",MRDTrackLength);
 
   if(not get_ok){

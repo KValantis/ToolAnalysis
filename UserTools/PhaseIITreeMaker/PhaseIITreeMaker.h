@@ -38,6 +38,7 @@ class PhaseIITreeMaker: public Tool {
   /// Saved in the RecoEvent store.
   bool FillMCTruthInfo();
   bool FillTankRecoInfo();
+  bool FillTrackLengthAndEnergyInfo();
   int LoadMRDTrackReco(int SubEventNumber);
   void LoadAllMRDHits(bool IsData);
   void FillRecoDebugInfo();
