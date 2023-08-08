@@ -4,24 +4,34 @@ The `DNNTrackLengthPredict` tool is used to reconstruct the track length of the 
 
 ## Data
 
-###Input
+### Input
 
 The following variables are obtained from the `EnergyReco` store:
+
 **MaxTotalHitsToDNN** `int`
+
 **lambda_vec** `std::vector<double>` Vector with all the lambda values for each event
+
 **digit_ts_vec** `std::vector<double>` Vector with the time of all the digits of each event
+
 **lambda_max** `double` The distance between the reconstructed vertex and last Cherenkov photon emission point along the track
+
 **num_pmt_hits** `int` Total number of pmt digits
+
 **num_lappd_hits** `int` Total number of lappd digits
+
 **TrueTrackLengthInWater** `int` MC track length in the water
 
 The following variables are obtained from the `ScalingVarsStore` store:
+
 **features_mean_values** `std::vector<double>` Vector with the means of each feature of the training dataset
+
 **features_std_values** `std::vector<double>` Vector with the standard deviations of each feature of the training dataset
 
-###Output
+### Output
 
 The following variables are passed on to the next tool via the `EnergyReco` store:
+
 **DNNRecoLength** `double` The reconstructed track length in water for a single event
 
 ## Configuration
