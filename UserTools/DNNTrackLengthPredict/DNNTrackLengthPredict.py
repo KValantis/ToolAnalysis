@@ -1,36 +1,12 @@
-##### Script To Validate DNN for Track Length Reconstruction in the water tank
-# bend over backwards for reproducible results
-# see https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
+##### DNNTrackLengthPredict Tool Script
 import numpy
 import tensorflow
 import random
-# The below is necessary for starting Numpy generated random numbers
-# in a well-defined initial state.
-numpy.random.seed(0)
-# The below is necessary for starting core Python generated random numbers
-# in a well-defined state.
-random.seed(12345)
-# Force TensorFlow to use single thread.
-# Multiple threads are a potential source of non-reproducible results.
-# For further details, see: https://stackoverflow.com/questions/42022950/
-#session_conf = tensorflow.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-tensorflow.config.threading.set_intra_op_parallelism_threads(1)
-tensorflow.config.threading.set_inter_op_parallelism_threads(1)
-from tensorflow.keras import backend as K
-# The below tf.set_random_seed() will make random number generation
-# in the TensorFlow backend have a well-defined initial state.
-# For further details, see:
-# https://www.tensorflow.org/api_docs/python/tf/set_random_seed
-tensorflow.random.set_seed(1234)
-#sess = tensorflow.Session(graph=tensorflow.get_default_graph(), config=session_conf)
-#K.set_session(sess)
 import sys
 import glob
 import numpy as np
 import pandas #as pd
-#import tensorflow #as tf
 import tempfile
-#import random
 import csv
 import matplotlib
 matplotlib.use('Agg')
@@ -47,7 +23,6 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 from tensorflow.keras import backend as K
 import pprint
-import ROOT
 #import Store and other modules
 from Tool import *
 
@@ -196,9 +171,6 @@ class DNNTrackLengthPredict(Tool):
         print("scoring sk mse")
         score_sklearn = metrics.mean_squared_error(y_predicted, labels)
         print('MSE (sklearn): {0:f}'.format(score_sklearn))
-        
-        print("DNNTrackLengthPredict Tool: Clearing session")
-        K.clear_session()
 
         #Set the DNNRecoLength in the EnergyReco boost store for next tools
         DNNRecoLength=float(y_predicted[0])
