@@ -1,6 +1,6 @@
 # PlotsTrackLengthAndEnergy
 
-PlotsTrackLengthAndEnergy
+The `PlotsTrackLengthAndEnergy` tool is used to plot the reconstructed track length and energy from the DNN and the BDT. Therefore this tool should be run only after running the `EnergyRecoPredict` toolchain. This tool loads the `EnergyReco` boost store that is being saved locally by the `BDTMuonEnergyPredict` tool in order to make the plots we want.
 
 ## Data
 
