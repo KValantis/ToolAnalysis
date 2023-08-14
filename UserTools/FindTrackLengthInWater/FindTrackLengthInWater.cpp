@@ -294,7 +294,7 @@ bool FindTrackLengthInWater::Execute(){
         Log("FindTrackLengthInWater Tool: putting event "+to_string(EventNumber)+" into the EnergyReco store",v_debug,verbosity);
         m_data->Stores.at("EnergyReco")->Set("ThisEvtNum",EventNumber);
         //std::cout<<"This is the Eventnumber you are looking for"<<EventNumber<<std::endl;
-        std::cout<<"This is the lambda_vec before being set into the boostStore"<<lambda_vector.size()<<std::endl;
+        std::cout<<"This is the lambda_vec before being set into the boostStore with size "<<lambda_vector.size()<<std::endl;
         for (int i=0; i < (int) lambda_vector.size(); i++){std::cout << lambda_vector.at(i)<<std::endl;}
         Log("FindTrackLengthInWater Tool: lambda_vector: "+to_string(lambda_vector.size())+"  FINISHED",v_debug,verbosity);
         m_data->Stores.at("EnergyReco")->Set("lambda_vec",lambda_vector);
@@ -313,11 +313,11 @@ bool FindTrackLengthInWater::Execute(){
         m_data->Stores.at("EnergyReco")->Set("vtxVec",theExtendedVertex->GetPosition());
         m_data->Stores.at("EnergyReco")->Set("recoTrackLengthInMrd",MRDTrackLength);
 
-  if(not get_ok){
+  if(not fDoTraining){
     Log("FindTrackLengthInWater Tool: Not doing training, so BoostStore will not be saved locally",v_error,verbosity);
     }
 // only save all data to disk when training
-if (fDoTraining){ 
+if(fDoTraining){ 
      m_data->Stores.at("EnergyReco")->Save("EnergyReco.bs");    // write this Energy Reco entry to disk. If the file exists, it appends as a new entry.
      }     
 //---------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -336,6 +336,7 @@ if (fDoTraining){
      Log("FindTrackLengthInWater Tool: output file is closed, skipping write",v_debug,verbosity);
      return true;
   }
+  
   for(int i=0; i<maxhits0;++i){
      csvfile<<lambda_vector.at(i)<<",";
   }

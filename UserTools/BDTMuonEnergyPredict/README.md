@@ -4,22 +4,32 @@ The `BDTMuonEnergyPredict` tool is used to reconstruct the energy of the muon us
 
 ## Data
 
-###Input
+### Input
 
 The following variables are obtained from the `EnergyReco` store:
+
 **DNNRecoLength** `double` The reconstructed track length in water for a single event
+
 **num_pmt_hits** `int` Total number of pmt digits
+
 **num_lappd_hits** `int` Total number of lappd digits
+
 **recoTrackLengthInMrd** Track length of a reconstructed track in the MRD found by the `FindMrdTracks` tool
+
 **diffDirAbs** `double` Angle difference between the reconstructed z direction and the beam direction at (0,0,1)
+
 **recoDWallR** `double` Radial distance of the reconstructed vertex from the walls of the tank 
+
 **recoDWallZ** `double` Axial distance of the reconstructed vertex from the walls of the tank
+
 **vtxVec** `Position` Position of the reconstructed vertex
+
 **TrueMuonEnergy** `double` MC muon energy
 
-###Output
+### Output
 
 The following variables are passed on to the next tool via the `EnergyReco` store:
+
 **BDTMuonEnergy** `double` The reconstructed energy of the muon for a single event
 
 ## Configuration

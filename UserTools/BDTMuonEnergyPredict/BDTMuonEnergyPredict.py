@@ -1,4 +1,4 @@
-# python Tool script
+# BDTMuonEnergy Tool script
 # ------------------
 from Tool import *
 import sys

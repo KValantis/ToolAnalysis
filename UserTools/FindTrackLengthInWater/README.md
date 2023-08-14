@@ -4,37 +4,58 @@ The `FindTrackLengthInWater` tool uses the `find_lambda()` function to calculate
 
 ## Data
 
-###Input
+### Input
 
 The following variables are obtained from the `ANNIEEvent` store:
+
 **EventNumber** `uint32_t`
+
 **AnnieGeometry**(Header) `Geometry` Retrieve the tank radius and the tank halfheight from the geometry object of the `ANNIEEvent` store
 
 The following variables are obtained from the `RecoEvent` store:
+
 **ExtendedVertex** `RecoVertex` Contains the reconstructed Vertex information
+
 **MrdTimeClusters** `vector<vector<int>>` One vector for each subevent containing the digit IDs for clustered hits in each subevent
+
 **TrueTrackLengthInWater** `double` MC track length in the water is retrieved from the `RecoEvent` store
+
 **TrueMuonEnergy** `double` MC muon energy is retrieved from the `RecoEvent` store
+
 **RecoDigit** `std::vector<RecoDigit>` One vector for each event containing the RecoDigit objects for each event
 
-###Output
+### Output
 
 The following variables are passed on to the next tool via the `EnergyReco` store:
 
 **MaxTotalHitsToDNN** `int`
+
 **ThisEvtNum** `uint32_t`
+
 **lambda_vec** `std::vector<double>` Vector with all the lambda values for each event
+
 **digit_ts_vec** `std::vector<double>` Vector with the time of all the digits of each event
+
 **lambda_max** `double` The distance between the reconstructed vertex and last Cherenkov photon emission point along the track
+
 **num_pmt_hits** `int` Total number of pmt digits
+
 **num_lappd_hits** `int` Total number of lappd digits
+
 **TrueTrackLengthInWater** `int` MC track length in the water
+
 **TrueMuonEnergy** `double` MC muon energy
+
 **diffDirAbs** `double` Angle difference between the reconstructed z direction and the beam direction at (0,0,1)
+
 **recoDWallR** `double` Radial distance of the reconstructed vertex from the walls of the tank 
+
 **recoDWallZ** `double` Axial distance of the reconstructed vertex from the walls of the tank 
+
 **dirVec** `Direction` Direction of the reconstructed vertex
+
 **vtxVec** `Position` Position of the reconstructed vertex
+
 **recoTrackLengthInMrd** Track length of a reconstructed track in the MRD found by the `FindMrdTracks` tool
 
 ## Configuration

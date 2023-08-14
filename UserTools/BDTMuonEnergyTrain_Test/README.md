@@ -4,19 +4,28 @@ The `BDTMuonEnergyTrain_Test` tool is used to train a Boosted Decision Tree(BDT)
 
 ## Data
 
-###Input
+### Input
 
 The following variables are obtained from the `EnergyReco` store:
+
 **num_pmt_hits** `int` Total number of pmt digits
+
 **num_lappd_hits** `int` Total number of lappd digits
+
 **recoTrackLengthInMrd** Track length of a reconstructed track in the MRD found by the `FindMrdTracks` tool
+
 **diffDirAbs** `double` Angle difference between the reconstructed z direction and the beam direction at (0,0,1)
+
 **recoDWallR** `double` Radial distance of the reconstructed vertex from the walls of the tank 
+
 **recoDWallZ** `double` Axial distance of the reconstructed vertex from the walls of the tank
+
 **vtxVec** `Position` Position of the reconstructed vertex
+
 **TrueMuonEnergy** `double` MC muon energy
 
 The following variables are obtained from the `DNNRecoLength` store:
+
 **DNNRecoLength** `std::vector<double>` Vector with the reconstructed track length in water for each event of the event sample
 
 ## Configuration
